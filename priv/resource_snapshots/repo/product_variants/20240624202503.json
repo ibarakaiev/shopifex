@@ -1,0 +1,117 @@
+{
+  "attributes": [
+    {
+      "default": "nil",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "archived_at",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "fragment(\"gen_random_uuid()\")",
+      "size": null,
+      "type": "uuid",
+      "source": "id",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": true,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "alias",
+      "references": null,
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "inserted_at",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "updated_at",
+      "references": null,
+      "allow_nil?": false,
+      "primary_key?": false,
+      "generated?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "uuid",
+      "source": "product_id",
+      "references": {
+        "name": "product_variants_product_id_fkey",
+        "table": "products",
+        "schema": "public",
+        "destination_attribute": "id",
+        "primary_key?": true,
+        "multitenancy": {
+          "global": null,
+          "attribute": null,
+          "strategy": null
+        },
+        "on_delete": "delete",
+        "on_update": null,
+        "deferrable": false,
+        "match_with": null,
+        "match_type": null,
+        "index?": false,
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null
+      },
+      "allow_nil?": true,
+      "primary_key?": false,
+      "generated?": false
+    }
+  ],
+  "table": "product_variants",
+  "hash": "2728B29974F87CE6774E0B7951D34AA7779593F7874AA782040C2C030538DE2A",
+  "repo": "Elixir.Shopifex.Repo",
+  "schema": null,
+  "check_constraints": [],
+  "custom_indexes": [],
+  "custom_statements": [],
+  "identities": [
+    {
+      "name": "unique_alias",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "product_id"
+        },
+        {
+          "type": "atom",
+          "value": "alias"
+        }
+      ],
+      "where": null,
+      "all_tenants?": false,
+      "base_filter": null,
+      "nils_distinct?": true,
+      "index_name": "product_variants_unique_alias_index"
+    }
+  ],
+  "multitenancy": {
+    "global": null,
+    "attribute": null,
+    "strategy": null
+  },
+  "base_filter": null,
+  "has_create_action": true
+}
