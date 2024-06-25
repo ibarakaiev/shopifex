@@ -7,7 +7,7 @@ defmodule Shopifex.Products.Enums.ProductType do
 
   def to_resource(type) do
     case type do
-      :standard -> Product
+      :static -> Product
     end
   end
 

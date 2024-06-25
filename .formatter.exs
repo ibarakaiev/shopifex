@@ -5,5 +5,5 @@
     :ash_postgres,
     :ash_state_machine
   ],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+  inputs: ["{mix,.formatter,.fireside}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]

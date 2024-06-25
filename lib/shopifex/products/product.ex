@@ -46,7 +46,7 @@ defmodule Shopifex.Products.Product do
     # displayed in the URL
     attribute :handle, :string, allow_nil?: false, public?: true
 
-    # i.e. :default (non-customizable) or :trivia (allows polymorphism)
+    # i.e. :static (non-customizable) or dynamic (allows polymorphism)
     attribute :type, Shopifex.Products.Enums.ProductType, allow_nil?: false, public?: true
 
     timestamps()
@@ -67,7 +67,7 @@ defmodule Shopifex.Products.Product do
   actions do
     defaults [:read, :destroy, update: :*]
 
-    # TODO: validate that :type is equal to :handle unless :type is :standard
+    # TODO: validate that :type is equal to :handle unless :type is :static
     create :create do
       primary? true
 
