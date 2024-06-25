@@ -25,20 +25,18 @@ defmodule Shopifex.MixProject do
 
   defp deps do
     [
-      # Ash
-      {:ash, "~> 3.0"},
-      {:ash_postgres, "~> 2.0"},
+      {:ash_postgres, [github: "ash-project/ash_postgres", override: true]},
+      {:ash, [github: "ash-project/ash", override: true]},
       {:ash_money, "~> 0.1.9"},
       {:ash_admin, "~> 0.11"},
-      {:ash_state_machine, "~> 0.2"},
       {:ash_archival, "~> 1.0"},
 
       # required for ash_money
       {:ex_money_sql, "~> 1.11"},
 
       # testing
-      {:smokestack, "~> 0.9", only: :test},
-      {:faker, "~> 0.18", only: :test}
+      {:smokestack, "~> 0.9"},
+      {:faker, "~> 0.18"}
     ]
   end
 
