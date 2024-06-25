@@ -1,10 +1,11 @@
 # Fireside configuration
 [
-  includes: [
+  lib: [
     "lib/shopifex/products.ex",
-    "lib/shopifex/products/**/*.{ex.exs}",
-    "test/shopifex/**/*.{ex,exs}",
-    "test/support/products_factory.ex"
+    "lib/shopifex/products/**/*.{ex,exs}"
   ],
-  overwritable: ["lib/shopifex/products/definitions.ex"]
+  overwritable: ["lib/shopifex/products/definitions.ex"],
+  tests: [
+    "test/shopifex/**/*_test.{ex,exs}"
+  ]
 ]
