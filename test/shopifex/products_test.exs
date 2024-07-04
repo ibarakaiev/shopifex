@@ -1,7 +1,7 @@
 defmodule Shopifex.ProductsTest do
   use Shopifex.DataCase, async: true
 
-  use Shopifex.Products.Factory
+  use Shopifex.ProductsFactory
 
   alias Shopifex.Products.PriceVariant
   alias Shopifex.Products.Product

@@ -1,4 +1,4 @@
-defmodule Shopifex.Products.Factory do
+defmodule Shopifex.ProductsFactory do
   @moduledoc false
   use Smokestack
 

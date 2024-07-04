@@ -2,12 +2,13 @@
 [
   lib: [
     "lib/shopifex/products.ex",
-    "lib/shopifex/products/**/*.{ex,exs}",
-    # TODO: move into :ash_money installer
-    "lib/shopifex/cldr.ex"
+    "lib/shopifex/products/**/*.{ex,exs}"
   ],
   overwritable: ["lib/shopifex/products/definitions.ex"],
   tests: [
-    # "test/shopifex/**/*_test.{ex,exs}"
+    "test/shopifex/**/*_test.{ex,exs}"
+  ],
+  test_supports: [
+    "test/support/products_factory.ex"
   ]
 ]
