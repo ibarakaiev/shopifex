@@ -10,7 +10,9 @@ defmodule Shopifex.Fireside do
         "test/shopifex/**/*_test.{ex,exs}"
       ],
       test_supports: [
-        "test/support/products_factory.ex"
+        "test/support/products_factory.ex",
+        # TODO: make optional
+        "test/support/data_case.ex"
       ]
     }
   end
@@ -18,11 +20,7 @@ defmodule Shopifex.Fireside do
   def setup(igniter) do
     otp_app = Igniter.Project.Application.app_name()
 
-    imported_ash_domains = [
-      Shopifex.Products.Product,
-      Shopifex.Products.ProductVariant,
-      Shopifex.Products.PriceVariant
-    ]
+    imported_ash_domains = [Shopifex.Products]
 
     Igniter.Project.Config.configure(
       igniter,
