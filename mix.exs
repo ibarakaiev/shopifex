@@ -26,8 +26,8 @@ defmodule Shopifex.MixProject do
   defp deps do
     [
       {:ash, [github: "ash-project/ash", override: true]},
-      {:ash_money, path: "../ash_money"},
       {:ash_postgres, path: "../ash_postgres", override: true},
+      {:ash_money, path: "../ash_money"},
       {:ash_admin, "~> 0.11"},
       {:ash_archival, "~> 1.0"},
 
