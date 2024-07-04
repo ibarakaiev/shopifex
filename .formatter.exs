@@ -4,5 +4,5 @@
     :ash,
     :ash_postgres
   ],
-  inputs: ["{mix,.formatter,.fireside}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+  inputs: ["{mix,.formatter,fireside}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
