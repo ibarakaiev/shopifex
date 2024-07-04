@@ -1,5 +1,5 @@
 defmodule Shopifex.Fireside do
-  def app do
+  def config do
     %{
       lib: [
         "lib/shopifex/products.ex",
@@ -13,5 +13,26 @@ defmodule Shopifex.Fireside do
         "test/support/products_factory.ex"
       ]
     }
+  end
+
+  def setup(igniter) do
+    otp_app = Igniter.Project.Application.app_name()
+
+    imported_ash_domains = [
+      Shopifex.Products.Product,
+      Shopifex.Products.ProductVariant,
+      Shopifex.Products.PriceVariant
+    ]
+
+    Igniter.Project.Config.configure(
+      igniter,
+      "config.exs",
+      otp_app,
+      [:ash_domains],
+      imported_ash_domains,
+      updater: fn zipper ->
+        Igniter.Code.List.append_new_to_list(zipper, imported_ash_domains)
+      end
+    )
   end
 end
