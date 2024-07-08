@@ -10,7 +10,7 @@ defmodule Shopifex.Fireside do
         "test/shopifex/**/*_test.{ex,exs}"
       ],
       test_supports: [
-        "test/support/products_factory.ex"
+        "test/support/shopifex/products_factory.ex"
       ]
     }
   end
