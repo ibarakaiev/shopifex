@@ -63,7 +63,7 @@ defmodule Shopifex.ProductsTest do
            id: product_variant_id
          }
        } do
-    {:ok, loaded_product} = Product.get_by_id(product.id)
+    {:ok, loaded_product} = product.id |> Product.get_by_id() |> Ash.load(:product_variants)
 
     assert loaded_product.id == product.id
     assert [%{id: ^product_variant_id}] = loaded_product.product_variants
@@ -75,6 +75,7 @@ defmodule Shopifex.ProductsTest do
       Product.add_product_variant(product, %{
         product_variant: %{default_price_variant: %{price: "49.99", compare_at_price: "59.99"}}
       })
+      |> Ash.load(:product_variants)
 
     assert length(product.product_variants) == 2
   end

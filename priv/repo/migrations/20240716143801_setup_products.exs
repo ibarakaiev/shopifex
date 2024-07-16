@@ -1,4 +1,4 @@
-defmodule Shopifex.Repo.Migrations.AddSkeleton do
+defmodule Shopifex.Repo.Migrations.SetupProducts do
   @moduledoc """
   Updates resources based on their most recent snapshots.
 
@@ -9,7 +9,6 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
 
   def up do
     create table(:products, primary_key: false) do
-      add(:archived_at, :utc_datetime_usec)
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
       add(:title, :text, null: false)
       add(:description, :text, null: false)
@@ -29,10 +28,10 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
       )
 
       add(:selected_product_variant_id, :uuid)
+      add(:archived_at, :utc_datetime_usec)
     end
 
     create table(:product_variants, primary_key: false) do
-      add(:archived_at, :utc_datetime_usec)
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
     end
 
@@ -73,6 +72,8 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
           on_delete: :delete_all
         )
       )
+
+      add(:archived_at, :utc_datetime_usec)
     end
 
     create unique_index(:product_variants, [:product_id, :alias],
@@ -80,7 +81,6 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
            )
 
     create table(:price_variants, primary_key: false) do
-      add(:archived_at, :utc_datetime_usec)
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
       add(:price, :money_with_currency, null: false)
       add(:compare_at_price, :money_with_currency)
@@ -106,6 +106,8 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
           on_delete: :delete_all
         )
       )
+
+      add(:archived_at, :utc_datetime_usec)
     end
   end
 
@@ -123,6 +125,7 @@ defmodule Shopifex.Repo.Migrations.AddSkeleton do
     drop(constraint(:product_variants, "product_variants_product_id_fkey"))
 
     alter table(:product_variants) do
+      remove(:archived_at)
       remove(:product_id)
       remove(:updated_at)
       remove(:inserted_at)
