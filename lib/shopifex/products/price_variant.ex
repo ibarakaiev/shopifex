@@ -17,6 +17,27 @@ defmodule Shopifex.Products.PriceVariant do
     end
   end
 
+  code_interface do
+    domain Shopifex.Products
+
+    define :create, action: :create
+    define :read_all, action: :read
+    define :get_by_id, action: :by_id, args: [:id]
+  end
+
+  actions do
+    # it should not be possible to update PriceVariant for integrity & analytics purposes
+    defaults [:read, :destroy, create: [:price, :compare_at_price, :add_ons, :product_variant_id]]
+
+    read :by_id do
+      argument :id, :uuid, allow_nil?: false
+
+      get? true
+
+      filter expr(id == ^arg(:id))
+    end
+  end
+
   attributes do
     uuid_primary_key :id
 
@@ -33,26 +54,5 @@ defmodule Shopifex.Products.PriceVariant do
 
   relationships do
     belongs_to :product_variant, Shopifex.Products.ProductVariant, public?: true
-  end
-
-  actions do
-    # it should not be possible to update PriceVariant for integrity & analytics purposes
-    defaults [:read, :destroy, create: [:price, :compare_at_price, :add_ons, :product_variant_id]]
-
-    read :by_id do
-      argument :id, :uuid, allow_nil?: false
-
-      get? true
-
-      filter expr(id == ^arg(:id))
-    end
-  end
-
-  code_interface do
-    domain Shopifex.Products
-
-    define :create, action: :create
-    define :read_all, action: :read
-    define :get_by_id, action: :by_id, args: [:id]
   end
 end

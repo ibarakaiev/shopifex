@@ -15,53 +15,18 @@ defmodule Shopifex.Products.Product do
     table "products"
   end
 
-  calculations do
-    # uses :selected_variant if set, otherwise picks the oldest variant
-    calculate :display_product_variant,
-              :struct,
-              Calculations.DisplayProductVariant,
-              constraints: [instance_of: Shopifex.Products.ProductVariant]
+  code_interface do
+    domain Shopifex.Products
 
-    calculate :personalizable?, :boolean, expr(type != :static)
-  end
+    define :create, action: :create
+    define :read_all, action: :read
+    define :get_by_id, action: :by_id, args: [:id]
+    define :get_by_handle, action: :by_handle, args: [:handle]
+    define :update, action: :update
+    define :add_product_variant, action: :add_product_variant
+    define :destroy, action: :destroy
 
-  preparations do
-    # all variants and the variant that gets displayed
-    prepare build(load: [:selected_product_variant, :display_product_variant])
-  end
-
-  attributes do
-    uuid_primary_key :id
-
-    attribute :title, :string, allow_nil?: false, public?: true
-    attribute :description, :string, allow_nil?: false, public?: true
-
-    attribute :image_urls, {:array, :string}, public?: true
-
-    attribute :status, Shopifex.Products.Enums.ProductStatus,
-      allow_nil?: false,
-      default: :draft,
-      public?: true
-
-    # displayed in the URL
-    attribute :handle, :string, allow_nil?: false, public?: true
-
-    # i.e. :static (non-customizable) or dynamic (allows polymorphism)
-    attribute :type, Shopifex.Products.Enums.ProductType, allow_nil?: false, public?: true
-
-    timestamps()
-  end
-
-  relationships do
-    has_many :product_variants, Shopifex.Products.ProductVariant
-
-    belongs_to :selected_product_variant, Shopifex.Products.ProductVariant,
-      description:
-        "If set, will overwrite the default behavior of loading the oldest-created variant"
-  end
-
-  identities do
-    identity :handle, [:handle]
+    define_calculation :personalizable?, args: [:_record]
   end
 
   actions do
@@ -108,17 +73,52 @@ defmodule Shopifex.Products.Product do
     end
   end
 
-  code_interface do
-    domain Shopifex.Products
+  preparations do
+    # all variants and the variant that gets displayed
+    prepare build(load: [:selected_product_variant, :display_product_variant])
+  end
 
-    define :create, action: :create
-    define :read_all, action: :read
-    define :get_by_id, action: :by_id, args: [:id]
-    define :get_by_handle, action: :by_handle, args: [:handle]
-    define :update, action: :update
-    define :add_product_variant, action: :add_product_variant
-    define :destroy, action: :destroy
+  attributes do
+    uuid_primary_key :id
 
-    define_calculation :personalizable?, args: [:_record]
+    attribute :title, :string, allow_nil?: false, public?: true
+    attribute :description, :string, allow_nil?: false, public?: true
+
+    attribute :image_urls, {:array, :string}, public?: true
+
+    attribute :status, Shopifex.Products.Enums.ProductStatus,
+      allow_nil?: false,
+      default: :draft,
+      public?: true
+
+    # displayed in the URL
+    attribute :handle, :string, allow_nil?: false, public?: true
+
+    # i.e. :static (non-customizable) or dynamic (allows polymorphism)
+    attribute :type, Shopifex.Products.Enums.ProductType, allow_nil?: false, public?: true
+
+    timestamps()
+  end
+
+  relationships do
+    has_many :product_variants, Shopifex.Products.ProductVariant
+
+    belongs_to :selected_product_variant, Shopifex.Products.ProductVariant,
+      description:
+        "If set, will overwrite the default behavior of loading the oldest-created variant"
+  end
+
+  calculations do
+    # uses :selected_variant if set, otherwise picks the oldest variant
+    calculate :display_product_variant,
+              :struct,
+              Calculations.DisplayProductVariant,
+              constraints: [instance_of: Shopifex.Products.ProductVariant]
+
+    calculate :personalizable?, :boolean, expr(type != :static)
+  end
+
+  identities do
+    identity :handle, [:handle]
   end
 end

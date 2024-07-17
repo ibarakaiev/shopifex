@@ -4,6 +4,10 @@ defmodule Shopifex.Products do
 
   alias __MODULE__
 
+  admin do
+    show?(true)
+  end
+
   resources do
     resource Shopifex.Products.Product
     resource Shopifex.Products.ProductVariant
@@ -12,9 +16,5 @@ defmodule Shopifex.Products do
     for %{module: dynamic_product_module} <- Products.Definitions.dynamic_products() do
       resource dynamic_product_module
     end
-  end
-
-  admin do
-    show?(true)
   end
 end

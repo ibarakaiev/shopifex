@@ -26,13 +26,11 @@ defmodule Shopifex.MixProject do
   defp deps do
     [
       {:igniter, "~> 0.3"},
-
       {:ash, "~> 3.0"},
       {:ash_postgres, "~> 2.0"},
       {:ash_money, "~> 0.1"},
       {:ash_admin, "~> 0.11"},
       {:ash_archival, "~> 1.0"},
-
       {:ex_money_sql, "~> 1.0"},
       {:picosat_elixir, "~> 0.2"},
 
