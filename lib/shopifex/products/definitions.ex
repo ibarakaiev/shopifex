@@ -1,13 +1,18 @@
 defmodule Shopifex.Products.Definitions do
-  @moduledoc """
-  This module contains the definitions and configurations for dynamic products.
-  """
+  def dynamic_products do
+    Application.fetch_env!(Mix.Project.config()[:app], :shopifex_dynamic_products)
+  end
 
-  # format: %{
-  #   handle: :"dynamic-product-handle",
-  #   module: Shopifex.Products.Dynamic.DynamicProductHandle
-  # }
-  @dynamic_products []
+  def dynamic_product_handles do
+    Map.keys(dynamic_products())
+  end
 
-  def dynamic_products, do: @dynamic_products
+  def dynamic_product_modules do
+    dynamic_products()
+    |> Map.values()
+    |> Enum.flat_map(fn
+      %{primary: primary, nested: nested} -> [primary, nested]
+      module when is_atom(module) -> module
+    end)
+  end
 end

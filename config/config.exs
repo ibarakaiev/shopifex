@@ -4,6 +4,7 @@ config :ash, known_types: [AshMoney.Types.Money]
 config :ex_cldr, default_backend: Shopifex.Cldr
 config :shopifex, ecto_repos: [Shopifex.Repo]
 config :shopifex, ash_domains: [Shopifex.Products]
+config :shopifex, shopifex_dynamic_products: %{}
 
 config :spark,
   formatter: [

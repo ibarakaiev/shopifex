@@ -1,13 +1,18 @@
 defmodule Shopifex.Products.Enums.ProductType do
   @moduledoc false
   use Ash.Type.Enum,
-    values: [:static] ++ Enum.map(Shopifex.Products.Definitions.dynamic_products(), & &1.handle)
-
-  alias Shopifex.Products.Product
+    values: [:static] ++ Shopifex.Products.Definitions.dynamic_product_handles()
 
   def to_resource(type) do
     case type do
-      :static -> Product
+      :static ->
+        Shopifex.Products.Product
+
+      _ ->
+        case Shopifex.Products.Definitions.dynamic_products()[type] do
+          %{primary: module, nested: _rest} -> module
+          module -> module
+        end
     end
   end
 

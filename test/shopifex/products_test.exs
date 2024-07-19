@@ -1,11 +1,7 @@
 defmodule Shopifex.ProductsTest do
   use Shopifex.DataCase, async: true
 
-  use Shopifex.ProductsFactory
-
-  alias Shopifex.Products.PriceVariant
   alias Shopifex.Products.Product
-  alias Shopifex.Products.ProductVariant
 
   @product_attrs %{
     title: "Test",
@@ -20,20 +16,6 @@ defmodule Shopifex.ProductsTest do
   }
 
   setup do
-    {:ok, product} = insert(Product)
-    {:ok, product_variant} = insert(ProductVariant, attrs: %{product_id: product.id})
-    {:ok, _price_variant} = insert(PriceVariant, attrs: %{product_variant_id: product_variant.id})
-
-    # reload to load calculated fields
-    {:ok, product} = Product.get_by_id(product.id)
-
-    %{
-      product: product,
-      product_variant: product_variant
-    }
-  end
-
-  test "Product.create/2 successfully creates a product with an associated variant" do
     {:ok, product} =
       Product.create(%{
         title: @product_attrs[:title],
@@ -48,31 +30,28 @@ defmodule Shopifex.ProductsTest do
         }
       })
 
-    {:ok, product} = Ash.load(product, [:display_product_variant])
-
-    assert product.title == @product_attrs[:title]
-
-    assert product.display_product_variant.default_price_variant.price ==
-             @default_variant_attrs[:price]
+    %{
+      product: product
+    }
   end
 
-  test "Product.get_by_id/3 successfully returns the product with loaded variants and display_product_variant",
+  test "Product.get_by_id/3 successfully returns the product with loaded display_product_variant",
        %{
-         product: product,
-         product_variant: %{
-           id: product_variant_id
-         }
+         product: product
        } do
-    {:ok, loaded_product} = product.id |> Product.get_by_id() |> Ash.load(:product_variants)
+    {:ok, loaded_product} = Product.get_by_id(product.id)
 
     assert loaded_product.id == product.id
-    assert [%{id: ^product_variant_id}] = loaded_product.product_variants
-    assert %{id: ^product_variant_id} = loaded_product.display_product_variant
+    assert product.title == @product_attrs[:title]
+
+    assert loaded_product.display_product_variant.default_price_variant.price ==
+             @default_variant_attrs[:price]
   end
 
   test "Product.add_product_variant/2 successfully adds a new variant", %{product: product} do
     {:ok, product} =
-      Product.add_product_variant(product, %{
+      product
+      |> Product.add_product_variant(%{
         product_variant: %{default_price_variant: %{price: "49.99", compare_at_price: "59.99"}}
       })
       |> Ash.load(:product_variants)

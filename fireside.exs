@@ -30,5 +30,11 @@ defmodule Shopifex.Fireside do
         Igniter.Code.List.append_new_to_list(zipper, imported_ash_domains)
       end
     )
+    |> Igniter.Project.Config.configure_new(
+      "config.exs",
+      otp_app,
+      [:shopifex_dynamic_products],
+      %{}
+    )
   end
 end
