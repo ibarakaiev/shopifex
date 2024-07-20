@@ -1,4 +1,4 @@
-defmodule Shopifex.Repo.Migrations.SetupProducts do
+defmodule Shopifex.Repo.Migrations.Setup do
   @moduledoc """
   Updates resources based on their most recent snapshots.
 
@@ -109,9 +109,122 @@ defmodule Shopifex.Repo.Migrations.SetupProducts do
 
       add(:archived_at, :utc_datetime_usec)
     end
+
+    create table(:checkout_sessions, primary_key: false) do
+      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+
+      add(:inserted_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
+      )
+
+      add(:updated_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
+      )
+
+      add(:cart_id, :uuid)
+      add(:state, :text, null: false, default: "open")
+    end
+
+    create table(:carts, primary_key: false) do
+      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+    end
+
+    alter table(:checkout_sessions) do
+      modify(
+        :cart_id,
+        references(:carts,
+          column: :id,
+          name: "checkout_sessions_cart_id_fkey",
+          type: :uuid,
+          prefix: "public",
+          on_delete: :delete_all
+        )
+      )
+    end
+
+    alter table(:carts) do
+      add(:state, :text, null: false, default: "active")
+    end
+
+    create table(:cart_items, primary_key: false) do
+      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+      add(:quantity, :bigint, null: false, default: 1)
+      add(:product_type, :text, null: false, default: "static")
+      add(:dynamic_product_id, :uuid)
+
+      add(:inserted_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
+      )
+
+      add(:updated_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
+      )
+
+      add(
+        :cart_id,
+        references(:carts,
+          column: :id,
+          name: "cart_items_cart_id_fkey",
+          type: :uuid,
+          prefix: "public",
+          on_delete: :delete_all
+        ),
+        primary_key: true,
+        null: false
+      )
+
+      add(
+        :product_variant_id,
+        references(:product_variants,
+          column: :id,
+          name: "cart_items_product_variant_id_fkey",
+          type: :uuid,
+          prefix: "public"
+        )
+      )
+    end
+
+    create unique_index(
+             :cart_items,
+             [:cart_id, :product_variant_id, :product_type, :dynamic_product_id],
+             name: "cart_items_unique_cart_item_index",
+             nulls_distinct: false
+           )
   end
 
   def down do
+    drop_if_exists(
+      unique_index(
+        :cart_items,
+        [:cart_id, :product_variant_id, :product_type, :dynamic_product_id],
+        name: "cart_items_unique_cart_item_index"
+      )
+    )
+
+    drop(constraint(:cart_items, "cart_items_cart_id_fkey"))
+
+    drop(constraint(:cart_items, "cart_items_product_variant_id_fkey"))
+
+    drop(table(:cart_items))
+
+    alter table(:carts) do
+      remove(:state)
+    end
+
+    drop(constraint(:checkout_sessions, "checkout_sessions_cart_id_fkey"))
+
+    alter table(:checkout_sessions) do
+      modify(:cart_id, :uuid)
+    end
+
+    drop(table(:carts))
+
+    drop(table(:checkout_sessions))
+
     drop(constraint(:price_variants, "price_variants_product_variant_id_fkey"))
 
     drop(table(:price_variants))

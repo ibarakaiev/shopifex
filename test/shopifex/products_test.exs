@@ -1,6 +1,7 @@
 defmodule Shopifex.ProductsTest do
   use Shopifex.DataCase, async: true
 
+  alias Shopifex.Products.Enums.ProductType
   alias Shopifex.Products.Product
 
   @product_attrs %{
@@ -57,5 +58,12 @@ defmodule Shopifex.ProductsTest do
       |> Ash.load(:product_variants)
 
     assert length(product.product_variants) == 2
+  end
+
+  for {_type, resource} <- ProductType.dynamic_type_resource_pairs() do
+    @tag resource: resource
+    test "implements subtotal!/1", %{resource: resource} do
+      assert function_exported?(resource, :subtotal, 1)
+    end
   end
 end

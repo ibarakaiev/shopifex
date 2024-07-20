@@ -1,4 +1,4 @@
-defmodule Shopifex.Repo.Migrations.Install2Extensions20240716143612 do
+defmodule Shopifex.Repo.Migrations.Install2Extensions20240720221858 do
   @moduledoc """
   Installs any extensions that are mentioned in the repo's `installed_extensions/0` callback
 

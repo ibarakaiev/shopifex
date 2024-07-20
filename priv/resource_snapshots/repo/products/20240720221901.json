@@ -11,13 +11,66 @@
       "type": "uuid"
     },
     {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "title",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "description",
+      "type": "text"
+    },
+    {
       "allow_nil?": true,
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "alias",
+      "source": "image_urls",
+      "type": [
+        "array",
+        "text"
+      ]
+    },
+    {
+      "allow_nil?": false,
+      "default": "\"draft\"",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "status",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "handle",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "type",
       "type": "text"
     },
     {
@@ -58,15 +111,15 @@
           "global": null,
           "strategy": null
         },
-        "name": "product_variants_product_id_fkey",
-        "on_delete": "delete",
+        "name": "products_selected_product_variant_id_fkey",
+        "on_delete": null,
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "products"
+        "table": "product_variants"
       },
       "size": null,
-      "source": "product_id",
+      "source": "selected_product_variant_id",
       "type": "uuid"
     },
     {
@@ -85,23 +138,19 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "5CBFD563999CA6A25EC679D4AA7AA66E9EC2E0878F5850868D21DBB73502A53E",
+  "hash": "4987274E23EE9A10174E75FEB98EB9DD6D73D2BCF7DDCDC8A10A15A01DFBE56B",
   "identities": [
     {
       "all_tenants?": false,
       "base_filter": null,
-      "index_name": "product_variants_unique_alias_index",
+      "index_name": "products_handle_index",
       "keys": [
         {
           "type": "atom",
-          "value": "product_id"
-        },
-        {
-          "type": "atom",
-          "value": "alias"
+          "value": "handle"
         }
       ],
-      "name": "unique_alias",
+      "name": "handle",
       "nils_distinct?": true,
       "where": null
     }
@@ -113,5 +162,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "product_variants"
+  "table": "products"
 }

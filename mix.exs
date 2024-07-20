@@ -31,6 +31,7 @@ defmodule Shopifex.MixProject do
       {:ash_money, "~> 0.1"},
       {:ash_admin, "~> 0.11"},
       {:ash_archival, "~> 1.0"},
+      {:ash_state_machine, "~> 0.2.5"},
       {:ex_money_sql, "~> 1.0"},
       {:picosat_elixir, "~> 0.2"},
 

@@ -3,22 +3,23 @@ defmodule Shopifex.Fireside do
     %{
       lib: [
         "lib/shopifex/products.ex",
-        "lib/shopifex/products/**/*.{ex,exs}"
+        "lib/shopifex/products/**/*.{ex,exs}",
+        "lib/shopifex/carts.ex",
+        "lib/shopifex/carts/**/*.{ex,exs}",
+        "lib/shopifex/checkouts.ex",
+        "lib/shopifex/checkouts/**/*.{ex,exs}",
       ],
-      overwritable: ["lib/shopifex/products/definitions.ex"],
       tests: [
         "test/shopifex/**/*_test.{ex,exs}"
       ],
-      test_supports: [
-        "test/support/products_factory.ex"
-      ]
+      test_supports: []
     }
   end
 
   def setup(igniter) do
     otp_app = Igniter.Project.Application.app_name()
 
-    imported_ash_domains = [Shopifex.Products]
+    imported_ash_domains = [Shopifex.Products, Shopifex.Carts, Shopifex.Checkouts]
 
     igniter
     |> Igniter.Project.Config.configure(
