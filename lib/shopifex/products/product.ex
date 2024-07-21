@@ -41,7 +41,7 @@ defmodule Shopifex.Products.Product do
       argument :default_product_variant, :map, allow_nil?: false
 
       # create the passed `default_variant` as a variant
-      # (it will be selected as `display_variant`) since it will be the oldest
+      # (it will be selected as `display_variant` since it will be the oldest)
       change manage_relationship(:default_product_variant, :product_variants, type: :create)
     end
 
@@ -105,7 +105,8 @@ defmodule Shopifex.Products.Product do
 
     belongs_to :selected_product_variant, Shopifex.Products.ProductVariant,
       description:
-        "If set, will overwrite the default behavior of loading the oldest-created variant"
+        "If set, will overwrite the default behavior of loading the oldest-created variant",
+      public?: true
   end
 
   calculations do

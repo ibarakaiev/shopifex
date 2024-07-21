@@ -17,7 +17,7 @@ defmodule Shopifex.Products.Product.Calculations.DisplayProductVariant do
       case product.selected_product_variant do
         nil ->
           product.product_variants
-          |> Enum.min_by(&Map.get(&1, :inserted_at))
+          |> Enum.min(&NaiveDateTime.before?(&1.inserted_at, &2.inserted_at))
           |> then(fn product_variant -> ProductVariant.get_by_id!(product_variant.id) end)
 
         selected_product_variant ->

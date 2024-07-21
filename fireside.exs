@@ -7,7 +7,7 @@ defmodule Shopifex.Fireside do
         "lib/shopifex/carts.ex",
         "lib/shopifex/carts/**/*.{ex,exs}",
         "lib/shopifex/checkouts.ex",
-        "lib/shopifex/checkouts/**/*.{ex,exs}",
+        "lib/shopifex/checkouts/**/*.{ex,exs}"
       ],
       tests: [
         "test/shopifex/**/*_test.{ex,exs}"

@@ -14,7 +14,7 @@ defmodule Shopifex.Products.ProductVariant.Calculations.DefaultPriceVariant do
     Enum.map(product_variants, fn product_variant ->
       if length(product_variant.price_variants) > 0 do
         product_variant.price_variants
-        |> Enum.min_by(&Map.get(&1, :inserted_at))
+        |> Enum.min(&NaiveDateTime.before?(&1.inserted_at, &2.inserted_at))
         # loads the remaining fields
         |> then(fn price_variant -> PriceVariant.get_by_id!(price_variant.id) end)
       end

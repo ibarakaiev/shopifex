@@ -60,6 +60,43 @@ defmodule Shopifex.ProductsTest do
     assert length(product.product_variants) == 2
   end
 
+  test ":display_product_variant contains the oldest added product_variant if no selected_product_variant is set", %{product: product} do
+    {:ok, product} =
+      product
+      |> Product.add_product_variant!(%{
+        product_variant: %{default_price_variant: %{price: "49.99"}}
+      })
+      |> Ash.load([:display_product_variant, :selected_product_variant])
+
+    assert is_nil(product.selected_product_variant)
+
+    assert Money.equal?(
+             product.display_product_variant.default_price_variant.price,
+             Money.new(:USD, "39.99")
+           )
+  end
+
+  test ":display_product_variant contains :selected_product_variant if it it set", %{product: product} do
+    {:ok, product} =
+      product
+      |> Product.add_product_variant(%{
+        product_variant: %{default_price_variant: %{price: "49.99"}}
+      })
+      |> Ash.load(:product_variants)
+
+    newly_added_product_variant = Enum.find(product.product_variants, &Money.equal?(&1.default_price_variant.price, Money.new(:USD, "49.99")))
+
+    {:ok, product} =
+      product
+      |> Product.update(%{selected_product_variant_id: newly_added_product_variant.id})
+      |> Ash.load(:display_product_variant)
+
+    assert Money.equal?(
+             product.display_product_variant.default_price_variant.price,
+             newly_added_product_variant.default_price_variant.price
+           )
+  end
+
   for {_type, resource} <- ProductType.dynamic_type_resource_pairs() do
     @tag resource: resource
     test "implements subtotal!/1", %{resource: resource} do
