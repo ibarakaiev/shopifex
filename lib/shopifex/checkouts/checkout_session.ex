@@ -21,7 +21,7 @@ defmodule Shopifex.Checkouts.CheckoutSession do
 
     transitions do
       transition(:complete_checkout, from: :open, to: :complete)
-      transition(:expire, from: :open, to: :expired)
+      transition(:expire, from: [:open, :expired], to: :expired)
     end
   end
 
