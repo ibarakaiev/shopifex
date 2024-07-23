@@ -22,7 +22,10 @@ defmodule Shopifex.Carts.CartItem.Calculations.CompareAtSubtotal do
         # so we need to add the original difference between the base price and
         # the compare-at price to the actual subtotal
         _compare_at_price ->
-          diff = Money.sub!(price_variant.compare_at_price, price_variant.price)
+          diff =
+            price_variant.compare_at_price
+            |> Money.sub!(price_variant.price)
+            |> Money.mult!(cart_item.quantity)
 
           Money.add!(diff, CartItem.subtotal!(cart_item))
       end
