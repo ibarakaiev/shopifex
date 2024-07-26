@@ -11,10 +11,6 @@ defmodule Shopifex.Products.PriceVariant do
     repo Shopifex.Repo
 
     table "price_variants"
-
-    references do
-      reference :product_variant, on_delete: :delete
-    end
   end
 
   code_interface do
@@ -26,8 +22,18 @@ defmodule Shopifex.Products.PriceVariant do
   end
 
   actions do
-    # it should not be possible to update PriceVariant for integrity & analytics purposes
-    defaults [:read, :destroy, create: [:price, :compare_at_price, :add_ons, :product_variant_id]]
+    # it should not be possible to update or destroy PriceVariant for integrity & analytics purposes
+    defaults [:read]
+
+    create :create do
+      primary? true
+
+      upsert? true
+
+      upsert_identity :unique_product_price
+
+      accept :*
+    end
 
     read :by_id do
       argument :id, :uuid, allow_nil?: false
@@ -41,11 +47,7 @@ defmodule Shopifex.Products.PriceVariant do
   attributes do
     uuid_primary_key :id
 
-    # actual price charged
     attribute :price, AshMoney.Types.Money, allow_nil?: false, public?: true
-
-    # "original" price (if on sale)
-    attribute :compare_at_price, AshMoney.Types.Money, public?: true
 
     attribute :add_ons, {:array, PriceVariant.AddOn}, public?: true
 
@@ -53,6 +55,17 @@ defmodule Shopifex.Products.PriceVariant do
   end
 
   relationships do
-    belongs_to :product_variant, Shopifex.Products.ProductVariant, public?: true
+    many_to_many :product_variants, Shopifex.Products.ProductVariant do
+      through Shopifex.Products.ProductVariantPriceVariant
+
+      source_attribute_on_join_resource :price_variant_id
+      destination_attribute_on_join_resource :product_variant_id
+    end
+
+    belongs_to :product, Shopifex.Products.Product, public?: true
+  end
+
+  identities do
+    identity :unique_product_price, [:product_id, :price]
   end
 end

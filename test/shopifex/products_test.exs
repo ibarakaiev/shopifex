@@ -3,104 +3,206 @@ defmodule Shopifex.ProductsTest do
 
   alias Shopifex.Products.Enums.ProductType
   alias Shopifex.Products.Product
+  alias Shopifex.Products.ProductVariant
+  alias Shopifex.Products.PriceVariant
 
   @product_attrs %{
-    title: "Test",
-    description: "Description",
     handle: "test",
     type: :static
   }
 
-  @default_variant_attrs %{
-    price: Money.new(:USD, "39.99"),
-    compare_at_price: Money.new(:USD, "49.99")
+  @product_variant_attrs %{
+    title: "Test 1",
+    description: "Description 1"
+  }
+
+  @price_variant_attrs %{
+    price: Money.new(:USD, "39.99")
+  }
+
+  @compare_at_price_variant_attrs %{
+    price: Money.new(:USD, "49.99")
   }
 
   setup do
-    {:ok, product} =
-      Product.create(%{
-        title: @product_attrs[:title],
-        description: @product_attrs[:description],
+    product =
+      Product.create!(%{
         handle: @product_attrs[:handle],
         type: @product_attrs[:type],
-        default_product_variant: %{
-          default_price_variant: %{
-            price: @default_variant_attrs[:price],
-            compare_at_price: @default_variant_attrs[:compare_at_price]
+        product_variants: [
+          %{
+            title: @product_variant_attrs[:title],
+            description: @product_variant_attrs[:description],
+            price_variants: [
+              %{
+                price: @price_variant_attrs[:price]
+              },
+              %{
+                price: @compare_at_price_variant_attrs[:price]
+              }
+            ]
           }
-        }
+        ]
       })
 
     %{
-      product: product
+      product: Product.get_by_id!(product.id)
     }
   end
 
-  test "Product.get_by_id/3 successfully returns the product with loaded display_product_variant",
-       %{
-         product: product
-       } do
-    {:ok, loaded_product} = Product.get_by_id(product.id)
+  describe "Product" do
+    test "is created successfully", %{product: product} do
+      assert product.status == :draft
+      assert product.handle == @product_attrs[:handle]
+      assert product.type == @product_attrs[:type]
 
-    assert loaded_product.id == product.id
-    assert product.title == @product_attrs[:title]
+      assert Product.title!(product) == @product_variant_attrs[:title]
+      assert Product.description!(product) == @product_variant_attrs[:description]
 
-    assert loaded_product.display_product_variant.default_price_variant.price ==
-             @default_variant_attrs[:price]
+      assert Money.equal?(Product.price!(product), @price_variant_attrs[:price])
+
+      display_product_variant = Product.display_product_variant!(product)
+      display_price_variant = ProductVariant.display_price_variant!(display_product_variant)
+
+      assert display_price_variant.product_id == product.id
+    end
+
+    test "add_product_variants/2 adds news product variants with new prices", %{
+      product: product
+    } do
+      product =
+        product
+        |> Product.add_product_variants!([
+          %{
+            title: "Test 2",
+            description: "Description 2",
+            price_variants: [%{price: Money.new(:USD, "59.99")}]
+          }
+        ])
+        |> Ash.load!(:product_variants)
+
+      assert length(product.product_variants) == 2
+
+      all_price_variants = PriceVariant.read_all!()
+
+      assert length(all_price_variants) == 3
+    end
+
+    test "add_product_variants/2 adds news product variants and reuses existing prices",
+         %{
+           product: product
+         } do
+      product =
+        product
+        |> Product.add_product_variants!([
+          %{
+            title: "Test 2",
+            description: "Description 2",
+            price_variants: [%{price: Money.new(:USD, "39.99")}]
+          }
+        ])
+        |> Ash.load!(:product_variants)
+
+      assert length(product.product_variants) == 2
+
+      all_price_variants = PriceVariant.read_all!()
+
+      assert length(all_price_variants) == 2
+    end
+
+    test "display_product_variant/1,2", %{
+      product: product
+    } do
+      product =
+        product
+        |> Product.add_product_variants!([
+          %{
+            title: "Test 2",
+            description: "Description 2",
+            price_variants: [%{price: Money.new(:USD, "59.99")}]
+          }
+        ])
+        |> Ash.load!(:product_variants)
+
+      newly_added_product_variant_id =
+        Enum.find(product.product_variants, &(&1.title == "Test 2")).id
+
+      assert is_nil(product.selected_product_variant_id)
+
+      original_display_product_variant_id = Product.display_product_variant!(product).id
+
+      # currently set as it is the oldest oldest
+      assert original_display_product_variant_id != newly_added_product_variant_id
+
+      product = Product.select_display_product_variant!(product, newly_added_product_variant_id)
+
+      assert Product.display_product_variant!(product).id == newly_added_product_variant_id
+
+      assert Product.display_product_variant!(product, original_display_product_variant_id).id ==
+               original_display_product_variant_id
+
+      assert Product.title!(product, original_display_product_variant_id) == @product_variant_attrs[:title]
+      refute Product.title!(product) == @product_variant_attrs[:title]
+
+      assert Product.description!(product, original_display_product_variant_id) == @product_variant_attrs[:description]
+      refute Product.description!(product) == @product_variant_attrs[:description]
+    end
   end
 
-  test "Product.add_product_variant/2 successfully adds a new variant", %{product: product} do
-    {:ok, product} =
-      product
-      |> Product.add_product_variant(%{
-        product_variant: %{default_price_variant: %{price: "49.99", compare_at_price: "59.99"}}
-      })
-      |> Ash.load(:product_variants)
+  describe "ProductVariant" do
+    test "compare_at_price/2 returns the highest price in a product", %{
+      product: product
+    } do
+      display_product_variant = Product.display_product_variant!(product)
 
-    assert length(product.product_variants) == 2
-  end
+      compare_at_price = ProductVariant.compare_at_price!(display_product_variant)
 
-  test ":display_product_variant contains the oldest added product_variant if no selected_product_variant is set", %{product: product} do
-    {:ok, product} =
-      product
-      |> Product.add_product_variant!(%{
-        product_variant: %{default_price_variant: %{price: "49.99"}}
-      })
-      |> Ash.load([:display_product_variant, :selected_product_variant])
+      assert Money.equal?(compare_at_price, @compare_at_price_variant_attrs[:price])
+    end
 
-    assert is_nil(product.selected_product_variant)
+    test "display_price_variant/1,2",
+         %{product: product} do
+      product_variant = Product.display_product_variant!(product) |> Ash.load!(:price_variants)
 
-    assert Money.equal?(
-             product.display_product_variant.default_price_variant.price,
-             Money.new(:USD, "39.99")
-           )
-  end
+      lowest_price_variant =
+        Enum.find(
+          product_variant.price_variants,
+          &Money.equal?(&1.price, Money.new(:USD, "39.99"))
+        )
 
-  test ":display_product_variant contains :selected_product_variant if it it set", %{product: product} do
-    {:ok, product} =
-      product
-      |> Product.add_product_variant(%{
-        product_variant: %{default_price_variant: %{price: "49.99"}}
-      })
-      |> Ash.load(:product_variants)
+      highest_price_variant =
+        Enum.find(
+          product_variant.price_variants,
+          &Money.equal?(&1.price, Money.new(:USD, "49.99"))
+        )
 
-    newly_added_product_variant = Enum.find(product.product_variants, &Money.equal?(&1.default_price_variant.price, Money.new(:USD, "49.99")))
+      assert is_nil(product_variant.selected_price_variant_id)
 
-    {:ok, product} =
-      product
-      |> Product.update(%{selected_product_variant_id: newly_added_product_variant.id})
-      |> Ash.load(:display_product_variant)
+      # currently set because it was first in the list and is thus the oldest
+      assert ProductVariant.display_price_variant!(product_variant).id == lowest_price_variant.id
 
-    assert Money.equal?(
-             product.display_product_variant.default_price_variant.price,
-             newly_added_product_variant.default_price_variant.price
-           )
+      product_variant =
+        ProductVariant.select_display_price_variant!(product_variant, highest_price_variant.id)
+
+      assert ProductVariant.display_price_variant!(product_variant).id == highest_price_variant.id
+
+      assert ProductVariant.display_price_variant!(product_variant, lowest_price_variant.id).id ==
+               lowest_price_variant.id
+
+      refute Product.price!(product) == @price_variant_attrs[:price] 
+      assert Product.price!(product, lowest_price_variant.id) == @price_variant_attrs[:price] 
+    end
   end
 
   for {_type, resource} <- ProductType.dynamic_type_resource_pairs() do
     @tag resource: resource
-    test "implements subtotal!/1", %{resource: resource} do
-      assert function_exported?(resource, :subtotal, 1)
+    test "implements subtotal!/2", %{resource: resource} do
+      assert function_exported?(resource, :subtotal, 2)
+    end
+
+    @tag resource: resource
+    test "implements title!/1", %{resource: resource} do
+      assert function_exported?(resource, :title, 1)
     end
   end
 end

@@ -10,7 +10,7 @@ defmodule Shopifex.Carts.Cart do
   alias __MODULE__.Actions
   alias __MODULE__.Calculations
 
-  require Ash.Resource.Change.Builtins
+  alias Shopifex.Products.ProductVariant
 
   postgres do
     table "carts"
@@ -33,7 +33,7 @@ defmodule Shopifex.Carts.Cart do
     define :read_all, action: :read
     define :destroy, action: :destroy
 
-    define :add_to_cart, action: :add_to_cart
+    define :add_to_cart, action: :add_to_cart, args: [:cart_item]
     define :complete_checkout, action: :complete_checkout
 
     define :add_new_checkout_session, action: :add_new_checkout_session
@@ -41,6 +41,7 @@ defmodule Shopifex.Carts.Cart do
 
     define :get_by_id, args: [:id], action: :by_id
 
+    define_calculation :active_checkout_session, args: [:_record]
     define_calculation :contains?, args: [:_record, :product_type, :id]
     define_calculation :empty?, args: [:_record]
     define_calculation :subtotal, args: [:_record]
@@ -53,6 +54,25 @@ defmodule Shopifex.Carts.Cart do
       require_atomic? false
 
       argument :cart_item, :map, allow_nil?: false
+
+      change fn changeset, _ ->
+        {:ok, cart_item} = Ash.Changeset.fetch_argument(changeset, :cart_item)
+
+        product_variant = cart_item[:product_variant]
+
+        cart_item =
+          if Map.has_key?(cart_item, :price_variant) do
+            cart_item
+          else
+            Map.put(
+              cart_item,
+              :price_variant,
+              ProductVariant.display_price_variant!(product_variant)
+            )
+          end
+
+        Ash.Changeset.force_set_argument(changeset, :cart_item, cart_item)
+      end
 
       change manage_relationship(:cart_item, :cart_items,
                on_no_match: {:create, :create_or_increment_quantity},

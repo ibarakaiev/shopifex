@@ -12,6 +12,36 @@
     },
     {
       "allow_nil?": false,
+      "default": "\"draft\"",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "status",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "handle",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "type",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
       "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
       "generated?": false,
       "primary_key?": false,
@@ -48,26 +78,26 @@
           "global": null,
           "strategy": null
         },
-        "name": "checkout_sessions_cart_id_fkey",
-        "on_delete": "delete",
+        "name": "products_selected_product_variant_id_fkey",
+        "on_delete": "nilify",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "carts"
+        "table": "product_variants"
       },
       "size": null,
-      "source": "cart_id",
+      "source": "selected_product_variant_id",
       "type": "uuid"
     },
     {
-      "allow_nil?": false,
-      "default": "\"open\"",
+      "allow_nil?": true,
+      "default": "nil",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "state",
-      "type": "text"
+      "source": "archived_at",
+      "type": "utc_datetime_usec"
     }
   ],
   "base_filter": null,
@@ -75,8 +105,27 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "A52F4D69F2E155FF2BE57AF08F37EBC776F47D8EEA705E6F4EB9AED1310F2C19",
-  "identities": [],
+  "hash": "DE7E6C19C90FB3F196A0B26651B207A332F8CB9D3FC8F300759CACB0094CD008",
+  "identities": [
+    {
+      "all_tenants?": false,
+      "base_filter": null,
+      "index_name": "products_handle_index",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "handle"
+        },
+        {
+          "type": "atom",
+          "value": "archived_at"
+        }
+      ],
+      "name": "handle",
+      "nils_distinct?": false,
+      "where": null
+    }
+  ],
   "multitenancy": {
     "attribute": null,
     "global": null,
@@ -84,5 +133,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "checkout_sessions"
+  "table": "products"
 }

@@ -5,14 +5,17 @@ defmodule Shopifex.Products.Product do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshArchival.Resource]
 
-  alias Shopifex.Products.Product.Calculations
-
-  require Ash.Resource.Change.Builtins
+  alias __MODULE__.Calculations
+  alias __MODULE__.Changes
 
   postgres do
     repo Shopifex.Repo
 
     table "products"
+
+    references do
+      reference :selected_product_variant, on_delete: :nilify
+    end
   end
 
   code_interface do
@@ -22,38 +25,61 @@ defmodule Shopifex.Products.Product do
     define :read_all, action: :read
     define :get_by_id, action: :by_id, args: [:id]
     define :get_by_handle, action: :by_handle, args: [:handle]
-    define :update, action: :update
-    define :add_product_variant, action: :add_product_variant
+    define :update_status, action: :update_status, args: [:status]
+
+    define :add_product_variants, action: :add_product_variants, args: [:product_variants]
+
+    define :select_display_product_variant,
+      action: :select_display_product_variant,
+      args: [:selected_product_variant_id]
+
     define :destroy, action: :destroy
 
-    define_calculation :personalizable?, args: [:_record]
+    define_calculation :display_product_variant,
+      args: [:_record, {:optional, :product_variant_id}]
+
+    define_calculation :dynamic?, args: [:_record]
+
+    define_calculation :title, args: [:_record, {:optional, :product_variant_id}]
+    define_calculation :description, args: [:_record, {:optional, :product_variant_id}]
+    define_calculation :price, args: [:_record, {:optional, :price_variant_id}]
   end
 
   actions do
     defaults [:read, :destroy, update: :*]
 
-    # TODO: validate that :type is equal to :handle unless :type is :static
     create :create do
       primary? true
 
       accept :*
 
-      argument :default_product_variant, :map, allow_nil?: false
+      argument :product_variants, {:array, :map}, allow_nil?: false
 
-      # create the passed `default_variant` as a variant
-      # (it will be selected as `display_variant` since it will be the oldest)
-      change manage_relationship(:default_product_variant, :product_variants, type: :create)
+      change Changes.AddProductIdToProductVariants
+
+      change manage_relationship(:product_variants, type: :create)
     end
 
-    update :add_product_variant do
+    update :add_product_variants do
       require_atomic? false
 
-      argument :product_variant, :map, allow_nil?: false
+      argument :product_variants, {:array, :map}, allow_nil?: false
 
-      change manage_relationship(:product_variant, :product_variants,
-               on_lookup: :relate,
-               on_no_match: :create
-             )
+      change Changes.AddProductIdToProductVariants
+
+      change manage_relationship(:product_variants, type: :create)
+    end
+
+    update :select_display_product_variant do
+      argument :selected_product_variant_id, :uuid, allow_nil?: false
+
+      change atomic_update(:selected_product_variant_id, expr(^arg(:selected_product_variant_id)))
+    end
+
+    update :update_status do
+      argument :status, Shopifex.Products.Enums.ProductStatus, allow_nil?: false
+
+      change atomic_update(:status, arg(:status))
     end
 
     read :by_id do
@@ -73,18 +99,8 @@ defmodule Shopifex.Products.Product do
     end
   end
 
-  preparations do
-    # all variants and the variant that gets displayed
-    prepare build(load: [:selected_product_variant, :display_product_variant])
-  end
-
   attributes do
     uuid_primary_key :id
-
-    attribute :title, :string, allow_nil?: false, public?: true
-    attribute :description, :string, allow_nil?: false, public?: true
-
-    attribute :image_urls, {:array, :string}, public?: true
 
     attribute :status, Shopifex.Products.Enums.ProductStatus,
       allow_nil?: false,
@@ -94,7 +110,6 @@ defmodule Shopifex.Products.Product do
     # displayed in the URL
     attribute :handle, :string, allow_nil?: false, public?: true
 
-    # i.e. :static (non-customizable) or dynamic (allows polymorphism)
     attribute :type, Shopifex.Products.Enums.ProductType, allow_nil?: false, public?: true
 
     timestamps()
@@ -103,23 +118,35 @@ defmodule Shopifex.Products.Product do
   relationships do
     has_many :product_variants, Shopifex.Products.ProductVariant
 
-    belongs_to :selected_product_variant, Shopifex.Products.ProductVariant,
-      description:
-        "If set, will overwrite the default behavior of loading the oldest-created variant",
-      public?: true
+    belongs_to :selected_product_variant, Shopifex.Products.ProductVariant, public?: true
   end
 
   calculations do
-    # uses :selected_variant if set, otherwise picks the oldest variant
     calculate :display_product_variant,
               :struct,
-              Calculations.DisplayProductVariant,
-              constraints: [instance_of: Shopifex.Products.ProductVariant]
+              Calculations.DisplayProductVariant do
+      constraints instance_of: Shopifex.Products.ProductVariant
+      argument :product_variant_id, :uuid, allow_nil?: true
+    end
 
-    calculate :personalizable?, :boolean, expr(type != :static)
+    calculate :dynamic?, :boolean, expr(type != :static)
+
+    calculate :title, :string, Calculations.Title do
+      argument :product_variant_id, :uuid, allow_nil?: true
+    end
+
+    calculate :description, :string, Calculations.Description do
+      argument :product_variant_id, :uuid, allow_nil?: true
+    end
+
+    calculate :price, AshMoney.Types.Money, Calculations.Price do
+      argument :price_variant_id, :uuid, allow_nil?: true
+    end
+
   end
 
   identities do
-    identity :handle, [:handle]
+    # only one unarchived product with a given handle
+    identity :handle, [:handle, :archived_at], nils_distinct?: false
   end
 end

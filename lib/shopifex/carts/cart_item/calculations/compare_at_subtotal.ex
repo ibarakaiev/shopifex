@@ -12,7 +12,7 @@ defmodule Shopifex.Carts.CartItem.Calculations.CompareAtSubtotal do
   @impl true
   def calculate(cart_items, _opts, _arguments) do
     Enum.map(cart_items, fn cart_item ->
-      price_variant = cart_item.product_variant.default_price_variant
+      price_variant = cart_item.product_variant.display_price_variant
 
       case price_variant.compare_at_price do
         nil ->

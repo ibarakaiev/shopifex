@@ -27,16 +27,6 @@
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "compare_at_price",
-      "type": "money_with_currency"
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
       "source": "add_ons",
       "type": [
         "array",
@@ -81,15 +71,15 @@
           "global": null,
           "strategy": null
         },
-        "name": "price_variants_product_variant_id_fkey",
-        "on_delete": "delete",
+        "name": "price_variants_product_id_fkey",
+        "on_delete": null,
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "product_variants"
+        "table": "products"
       },
       "size": null,
-      "source": "product_variant_id",
+      "source": "product_id",
       "type": "uuid"
     },
     {
@@ -108,8 +98,27 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "3E13D5CE6E56841822DDA83766FAC632685B2D061C800B2E11C9F863F7AF395C",
-  "identities": [],
+  "hash": "B0D6DF1BBF73CECB33331A41E1A24DE10444EA25CFD848BB116A46DE3B954542",
+  "identities": [
+    {
+      "all_tenants?": false,
+      "base_filter": null,
+      "index_name": "price_variants_unique_product_price_index",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "product_id"
+        },
+        {
+          "type": "atom",
+          "value": "price"
+        }
+      ],
+      "name": "unique_product_price",
+      "nils_distinct?": true,
+      "where": null
+    }
+  ],
   "multitenancy": {
     "attribute": null,
     "global": null,

@@ -11,6 +11,7 @@ defmodule Shopifex.Products do
   resources do
     resource Shopifex.Products.Product
     resource Shopifex.Products.ProductVariant
+    resource Shopifex.Products.ProductVariantPriceVariant
     resource Shopifex.Products.PriceVariant
 
     # dynamic products can be configured in `config.exs` with either of the

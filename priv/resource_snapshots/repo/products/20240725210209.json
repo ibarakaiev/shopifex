@@ -11,14 +11,44 @@
       "type": "uuid"
     },
     {
+      "allow_nil?": false,
+      "default": "\"draft\"",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "status",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "handle",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "type",
+      "type": "text"
+    },
+    {
       "allow_nil?": true,
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "alias",
-      "type": "text"
+      "source": "selected_product_variant_id",
+      "type": "uuid"
     },
     {
       "allow_nil?": false,
@@ -45,35 +75,6 @@
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
-      "references": {
-        "deferrable": false,
-        "destination_attribute": "id",
-        "destination_attribute_default": null,
-        "destination_attribute_generated": null,
-        "index?": false,
-        "match_type": null,
-        "match_with": null,
-        "multitenancy": {
-          "attribute": null,
-          "global": null,
-          "strategy": null
-        },
-        "name": "product_variants_product_id_fkey",
-        "on_delete": "delete",
-        "on_update": null,
-        "primary_key?": true,
-        "schema": "public",
-        "table": "products"
-      },
-      "size": null,
-      "source": "product_id",
-      "type": "uuid"
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
       "references": null,
       "size": null,
       "source": "archived_at",
@@ -85,24 +86,24 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "9E84FE816FEA9958B9C1C970776919ACEC1CFA821BB19D2FF9A91F0044EBFF76",
+  "hash": "87FEBCD6CFD9625416F08D733FDC74D502D009F93E7FF97EE524A0DCEA0CA0E6",
   "identities": [
     {
       "all_tenants?": false,
       "base_filter": null,
-      "index_name": "product_variants_unique_alias_index",
+      "index_name": "products_handle_index",
       "keys": [
         {
           "type": "atom",
-          "value": "product_id"
+          "value": "handle"
         },
         {
           "type": "atom",
-          "value": "alias"
+          "value": "archived_at"
         }
       ],
-      "name": "unique_alias",
-      "nils_distinct?": true,
+      "name": "handle",
+      "nils_distinct?": false,
       "where": null
     }
   ],
@@ -113,5 +114,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "product_variants"
+  "table": "products"
 }

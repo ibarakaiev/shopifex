@@ -117,6 +117,35 @@
       "size": null,
       "source": "product_variant_id",
       "type": "uuid"
+    },
+    {
+      "allow_nil?": true,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": {
+        "deferrable": false,
+        "destination_attribute": "id",
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null,
+        "index?": false,
+        "match_type": null,
+        "match_with": null,
+        "multitenancy": {
+          "attribute": null,
+          "global": null,
+          "strategy": null
+        },
+        "name": "cart_items_price_variant_id_fkey",
+        "on_delete": null,
+        "on_update": null,
+        "primary_key?": true,
+        "schema": "public",
+        "table": "price_variants"
+      },
+      "size": null,
+      "source": "price_variant_id",
+      "type": "uuid"
     }
   ],
   "base_filter": null,
@@ -124,7 +153,7 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "FD363763EA349FB3D658CAC246FC7FE13D414741C7201C7CD78823A7BB9BE920",
+  "hash": "82B6ECD9EE2618EAE364865A4C9433A42BCFDE7652C2F7E50CA9FFFFE8371379",
   "identities": [
     {
       "all_tenants?": false,

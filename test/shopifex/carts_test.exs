@@ -12,7 +12,7 @@ defmodule Shopifex.CartsTest do
   end
 
   test "Cart.create/1 creates an empty cart" do
-    assert {:ok, cart} = Ash.load(Cart.create(), [:cart_items, :checkout_sessions])
+    cart = Ash.load!(Cart.create!(), [:cart_items, :checkout_sessions])
 
     assert cart.cart_items == []
     assert cart.checkout_sessions == []
@@ -30,11 +30,11 @@ defmodule Shopifex.CartsTest do
   end
 
   test "Cart.add_new_checkout_session/1 expires previous checkout sessions", %{cart: cart} do
-    {:ok, %{checkout_sessions: checkout_sessions}} =
+    %{checkout_sessions: checkout_sessions} =
       cart
       |> Cart.add_new_checkout_session!()
       |> Cart.add_new_checkout_session!()
-      |> Ash.load(:checkout_sessions)
+      |> Ash.load!(:checkout_sessions)
 
     [first_checkout_session, second_checkout_session] =
       Enum.sort(
@@ -46,14 +46,14 @@ defmodule Shopifex.CartsTest do
     assert second_checkout_session.state == :open
   end
 
-  test ":active_checkout_session contains the correct active checkout session", %{
+  test "active_checkout_session/1 contains the correct active checkout session", %{
     cart: cart
   } do
-    {:ok, %{checkout_sessions: checkout_sessions}} =
+    %{checkout_sessions: checkout_sessions} =
       cart
       |> Cart.add_new_checkout_session!()
       |> Cart.add_new_checkout_session!()
-      |> Ash.load(:checkout_sessions)
+      |> Ash.load!(:checkout_sessions)
 
     [_first_checkout_session, second_checkout_session] =
       Enum.sort(
@@ -61,7 +61,7 @@ defmodule Shopifex.CartsTest do
         &NaiveDateTime.before?(&1.inserted_at, &2.inserted_at)
       )
 
-    {:ok, cart} = Ash.load(cart, :active_checkout_session)
+    cart = Ash.load!(cart, :active_checkout_session)
 
     assert cart.active_checkout_session.state == :open
     assert cart.active_checkout_session.id == second_checkout_session.id
@@ -80,59 +80,62 @@ defmodule Shopifex.CartsTest do
   end
 
   describe "static products" do
-    setup do
-      {:ok, product} =
+    setup %{cart: cart} do
+      product =
         %{
-          title: "Test",
-          description: "Description",
           handle: "test",
           type: :static,
-          default_product_variant: %{
-            default_price_variant: %{
-              price: Money.new(:USD, "39.99"),
-              compare_at_price: Money.new(:USD, "49.99")
+          product_variants: [
+            %{
+              title: "Test",
+              description: "Description",
+              price_variants: [
+                %{
+                  price: Money.new(:USD, "39.99"),
+                  compare_at_price: Money.new(:USD, "49.99")
+                }
+              ]
             }
-          }
+          ]
         }
-        |> Product.create()
-        |> Ash.load(:display_product_variant)
+        |> Product.create!()
+
+      display_product_variant = Product.display_product_variant!(product)
+
+      cart = Cart.add_to_cart!(cart, %{product_variant: display_product_variant})
 
       %{
-        product_variant: product.display_product_variant
+        product_variant: display_product_variant,
+        cart: cart
       }
     end
 
-    test "Cart.add_to_cart/1 adds a product variant to the cart", %{
-      cart: cart,
-      product_variant: product_variant
-    } do
-      {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
+    test "Cart.add_to_cart/1 adds a product variant to the cart and fills in price_variant_id when not passed",
+         %{
+           cart: cart,
+           product_variant: product_variant
+         } do
+      %{product: product} = Ash.load!(product_variant, [:product])
 
-      {:ok, cart} = Ash.load(cart, [:cart_items])
+      price_variant = ProductVariant.display_price_variant!(product_variant)
 
-      {:ok, %ProductVariant{product: %Product{handle: product_handle}}} =
-        Ash.load(product_variant, [:product])
+      [cart_item] = cart.cart_items
 
-      assert [%CartItem{quantity: 1, display_id: ^product_handle}] = cart.cart_items
+      assert cart_item.quantity == 1
+      assert String.starts_with?(cart_item.display_id, product.handle)
+      assert cart_item.price_variant_id == price_variant.id
     end
 
     test "Cart.empty?/1 returns false for a non-empty cart", %{
-      cart: cart,
-      product_variant: product_variant
+      cart: cart
     } do
-      {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
-
       refute Cart.empty?(cart)
     end
 
     test "CartItem.update_quantity/3 expires all previous checkout sessions", %{
-      cart: cart,
-      product_variant: product_variant
+      cart: cart
     } do
-      {:ok, %{cart_items: [cart_item]} = cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
+      %{cart_items: [cart_item]} = cart
 
       CartItem.update_quantity(cart_item, %{quantity: cart_item.quantity + 1})
 
@@ -147,7 +150,7 @@ defmodule Shopifex.CartsTest do
       {:ok, cart} = Cart.add_new_checkout_session(cart)
 
       {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
+        Cart.add_to_cart(cart, %{product_variant: product_variant})
 
       assert_no_open_checkout_sessions(cart)
     end
@@ -157,10 +160,10 @@ defmodule Shopifex.CartsTest do
            cart: cart,
            product_variant: product_variant
          } do
-      for _ <- 1..5, reduce: cart do
+      for _ <- 1..4, reduce: cart do
         cart ->
           {:ok, cart} =
-            Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
+            Cart.add_to_cart(cart, %{product_variant: product_variant})
 
           cart
       end
@@ -171,13 +174,8 @@ defmodule Shopifex.CartsTest do
     end
 
     test "CartItem.update_quantity/2 increments, decrements, and modifies quantity", %{
-      cart: cart,
-      product_variant: product_variant
+      cart: cart
     } do
-      {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
-
-      {:ok, cart} = Ash.load(cart, [:cart_items])
       [cart_item] = cart.cart_items
 
       # increments
@@ -201,47 +199,58 @@ defmodule Shopifex.CartsTest do
       assert {:error, _error} = CartItem.update_quantity(updated_cart_item, %{quantity: -1})
     end
 
+    test "CartItem.display_product/1 contains the correct product", %{
+      cart: cart,
+      product_variant: product_variant
+    } do
+      [cart_item] = cart.cart_items
+      display_product = CartItem.display_product!(cart_item)
+
+      assert Product.title!(display_product) == product_variant.title
+      assert Product.description!(display_product) == product_variant.description
+    end
+
     test "Cart.contains?/3 returns true if a cart contains a product and false otherwise", %{
       cart: cart,
       product_variant: product_variant
     } do
-      {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
-
-      Cart.contains?(cart, :static, product_variant.id)
-      assert not Cart.contains?(cart, :static, "non-existent")
+      assert Cart.contains?(cart, :static, product_variant.id)
+      refute Cart.contains?(cart, :static, "non-existent")
     end
 
     test "Cart.subtotal/1 contains correct subtotal", %{
-      cart: cart,
-      product_variant: product_variant
+      cart: cart
     } do
-      {:ok, cart} =
-        Cart.add_to_cart(cart, %{cart_item: %{product_variant: product_variant}})
-
-      {:ok, new_product} =
+      new_product =
         %{
-          title: "Test 2",
-          description: "Description",
           handle: "test-2",
           type: :static,
-          default_product_variant: %{
-            default_price_variant: %{
-              price: Money.new(:USD, "0.01")
+          product_variants: [
+            %{
+              title: "Test 2",
+              description: "Description",
+              price_variants: [
+                %{
+                  price: Money.new(:USD, "0.01")
+                }
+              ]
             }
-          }
+          ]
         }
-        |> Product.create()
-        |> Ash.load(:display_product_variant)
+        |> Product.create!()
 
-      {:ok, %{cart_items: [_first_cart_item, second_cart_item]} = cart} =
-        Cart.add_to_cart(cart, %{
-          cart_item: %{product_variant: new_product.display_product_variant}
-        })
+      display_product_variant = Product.display_product_variant!(new_product)
+
+      cart = Cart.add_to_cart!(cart, %{product_variant: display_product_variant})
+
+      [_first_cart_item, second_cart_item] = cart.cart_items
 
       CartItem.update_quantity!(second_cart_item, %{quantity: 2})
 
-      subtotal = cart.id |> Cart.get_by_id!() |> Cart.subtotal!()
+      # reload to reflect cart item changes
+      cart = Cart.get_by_id!(cart.id)
+
+      subtotal = Cart.subtotal!(cart)
 
       assert Money.equal?(subtotal, Money.new(:USD, "40.01"))
     end
@@ -249,28 +258,43 @@ defmodule Shopifex.CartsTest do
 
   describe "Dynamic products" do
     for {type, resource} <- ProductType.dynamic_type_resource_pairs() do
-      setup do
-        {:ok, product} =
+      setup %{cart: cart} do
+        product =
           %{
-            title: Atom.to_string(unquote(type)),
-            description: "Description",
             handle: Atom.to_string(unquote(type)),
             type: unquote(type),
-            default_product_variant: %{
-              default_price_variant: %{
-                price: Money.new(:USD, "39.99"),
-                compare_at_price: Money.new(:USD, "49.99")
-              }
-            }
+            product_variants: [%{
+              title: Atom.to_string(unquote(type)),
+              description: "Description",
+              price_variants: [
+                %{
+                  price: Money.new(:USD, "39.99")
+                },
+                %{
+                  price: Money.new(:USD, "49.99")
+                }
+              ]
+            }]
           }
-          |> Product.create()
-          |> Ash.load(:display_product_variant)
+          |> Product.create!()
 
-        {:ok, dynamic_product} = unquote(resource).create()
+        cart =
+          Cart.add_to_cart!(cart, 
+            %{
+              product_variant: product_variant,
+              dynamic_product_id: dynamic_product.id,
+              product_type: unquote(type)
+            }
+          )
+
+        dynamic_product = unquote(resource).create!()
+
+        display_product_variant = Product.display_product_variant!(product)
 
         %{
+          cart: cart,
           dynamic_product: dynamic_product,
-          product_variant: product.display_product_variant
+          product_variant: display_product_variant
         }
       end
 
@@ -279,15 +303,6 @@ defmodule Shopifex.CartsTest do
         dynamic_product: %{id: dynamic_product_id, hash: dynamic_product_hash} = dynamic_product,
         product_variant: %{id: product_variant_id} = product_variant
       } do
-        {:ok, cart} =
-          Cart.add_to_cart(cart, %{
-            cart_item: %{
-              product_variant: product_variant,
-              dynamic_product_id: dynamic_product.id,
-              product_type: unquote(type)
-            }
-          })
-
         assert [
                  %CartItem{
                    quantity: 1,
@@ -305,10 +320,10 @@ defmodule Shopifex.CartsTest do
              dynamic_product: %{id: dynamic_product_id} = dynamic_product,
              product_variant: %{id: product_variant_id} = product_variant
            } do
-        for _ <- 1..5, reduce: cart do
+        for _ <- 1..4, reduce: cart do
           cart ->
-            {:ok, cart} =
-              Cart.add_to_cart(cart, %{
+            cart =
+              Cart.add_to_cart!(cart, %{
                 cart_item: %{
                   product_variant: product_variant,
                   dynamic_product_id: dynamic_product.id,
@@ -319,7 +334,7 @@ defmodule Shopifex.CartsTest do
             cart
         end
 
-        {:ok, cart} = Ash.load(cart, [:cart_items])
+        cart = Ash.load!(cart, [:cart_items])
 
         assert [
                  %CartItem{
@@ -336,15 +351,6 @@ defmodule Shopifex.CartsTest do
         dynamic_product: %{id: dynamic_product_id} = dynamic_product,
         product_variant: product_variant
       } do
-        {:ok, cart} =
-          Cart.add_to_cart(cart, %{
-            cart_item: %{
-              product_variant: product_variant,
-              dynamic_product_id: dynamic_product.id,
-              product_type: unquote(type)
-            }
-          })
-
         assert Cart.contains?(cart, unquote(type), dynamic_product_id)
         assert not Cart.contains?(cart, unquote(type), "non-existent")
       end

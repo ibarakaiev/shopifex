@@ -10,12 +10,10 @@ defmodule Shopifex.Repo.Migrations.Setup do
   def up do
     create table(:products, primary_key: false) do
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
-      add(:title, :text, null: false)
-      add(:description, :text, null: false)
-      add(:image_urls, {:array, :text})
       add(:status, :text, null: false, default: "draft")
       add(:handle, :text, null: false)
       add(:type, :text, null: false)
+      add(:selected_product_variant_id, :uuid)
 
       add(:inserted_at, :utc_datetime_usec,
         null: false,
@@ -27,30 +25,21 @@ defmodule Shopifex.Repo.Migrations.Setup do
         default: fragment("(now() AT TIME ZONE 'utc')")
       )
 
-      add(:selected_product_variant_id, :uuid)
       add(:archived_at, :utc_datetime_usec)
     end
 
+    create unique_index(:products, [:handle, :archived_at],
+             name: "products_handle_index",
+             nulls_distinct: false
+           )
+
     create table(:product_variants, primary_key: false) do
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
-    end
-
-    alter table(:products) do
-      modify(
-        :selected_product_variant_id,
-        references(:product_variants,
-          column: :id,
-          name: "products_selected_product_variant_id_fkey",
-          type: :uuid,
-          prefix: "public"
-        )
-      )
-    end
-
-    create unique_index(:products, [:handle], name: "products_handle_index")
-
-    alter table(:product_variants) do
       add(:alias, :text)
+      add(:title, :text, null: false)
+      add(:description, :text, null: false)
+      add(:image_urls, {:array, :text})
+      add(:selected_price_variant_id, :uuid)
 
       add(:inserted_at, :utc_datetime_usec,
         null: false,
@@ -70,7 +59,8 @@ defmodule Shopifex.Repo.Migrations.Setup do
           type: :uuid,
           prefix: "public",
           on_delete: :delete_all
-        )
+        ),
+        null: false
       )
 
       add(:archived_at, :utc_datetime_usec)
@@ -80,10 +70,40 @@ defmodule Shopifex.Repo.Migrations.Setup do
              name: "product_variants_unique_alias_index"
            )
 
+    create table(:product_variant_price_variants, primary_key: false) do
+      add(
+        :product_variant_id,
+        references(:product_variants,
+          column: :id,
+          name: "product_variant_price_variants_product_variant_id_fkey",
+          type: :uuid,
+          prefix: "public"
+        ),
+        primary_key: true,
+        null: false
+      )
+
+      add(:price_variant_id, :uuid, null: false, primary_key: true)
+    end
+
     create table(:price_variants, primary_key: false) do
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+    end
+
+    alter table(:product_variant_price_variants) do
+      modify(
+        :price_variant_id,
+        references(:price_variants,
+          column: :id,
+          name: "product_variant_price_variants_price_variant_id_fkey",
+          type: :uuid,
+          prefix: "public"
+        )
+      )
+    end
+
+    alter table(:price_variants) do
       add(:price, :money_with_currency, null: false)
-      add(:compare_at_price, :money_with_currency)
       add(:add_ons, {:array, :map})
 
       add(:inserted_at, :utc_datetime_usec,
@@ -97,18 +117,21 @@ defmodule Shopifex.Repo.Migrations.Setup do
       )
 
       add(
-        :product_variant_id,
-        references(:product_variants,
+        :product_id,
+        references(:products,
           column: :id,
-          name: "price_variants_product_variant_id_fkey",
+          name: "price_variants_product_id_fkey",
           type: :uuid,
-          prefix: "public",
-          on_delete: :delete_all
+          prefix: "public"
         )
       )
 
       add(:archived_at, :utc_datetime_usec)
     end
+
+    create unique_index(:price_variants, [:product_id, :price],
+             name: "price_variants_unique_product_price_index"
+           )
 
     create table(:checkout_sessions, primary_key: false) do
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
@@ -186,6 +209,16 @@ defmodule Shopifex.Repo.Migrations.Setup do
           prefix: "public"
         )
       )
+
+      add(
+        :price_variant_id,
+        references(:price_variants,
+          column: :id,
+          name: "cart_items_price_variant_id_fkey",
+          type: :uuid,
+          prefix: "public"
+        )
+      )
     end
 
     create unique_index(
@@ -209,6 +242,8 @@ defmodule Shopifex.Repo.Migrations.Setup do
 
     drop(constraint(:cart_items, "cart_items_product_variant_id_fkey"))
 
+    drop(constraint(:cart_items, "cart_items_price_variant_id_fkey"))
+
     drop(table(:cart_items))
 
     alter table(:carts) do
@@ -225,9 +260,44 @@ defmodule Shopifex.Repo.Migrations.Setup do
 
     drop(table(:checkout_sessions))
 
-    drop(constraint(:price_variants, "price_variants_product_variant_id_fkey"))
+    drop_if_exists(
+      unique_index(:price_variants, [:product_id, :price],
+        name: "price_variants_unique_product_price_index"
+      )
+    )
+
+    drop(constraint(:price_variants, "price_variants_product_id_fkey"))
+
+    alter table(:price_variants) do
+      remove(:archived_at)
+      remove(:product_id)
+      remove(:updated_at)
+      remove(:inserted_at)
+      remove(:add_ons)
+      remove(:price)
+    end
+
+    drop(
+      constraint(
+        :product_variant_price_variants,
+        "product_variant_price_variants_price_variant_id_fkey"
+      )
+    )
+
+    alter table(:product_variant_price_variants) do
+      modify(:price_variant_id, :uuid)
+    end
 
     drop(table(:price_variants))
+
+    drop(
+      constraint(
+        :product_variant_price_variants,
+        "product_variant_price_variants_product_variant_id_fkey"
+      )
+    )
+
+    drop(table(:product_variant_price_variants))
 
     drop_if_exists(
       unique_index(:product_variants, [:product_id, :alias],
@@ -237,23 +307,11 @@ defmodule Shopifex.Repo.Migrations.Setup do
 
     drop(constraint(:product_variants, "product_variants_product_id_fkey"))
 
-    alter table(:product_variants) do
-      remove(:archived_at)
-      remove(:product_id)
-      remove(:updated_at)
-      remove(:inserted_at)
-      remove(:alias)
-    end
-
-    drop_if_exists(unique_index(:products, [:handle], name: "products_handle_index"))
-
-    drop(constraint(:products, "products_selected_product_variant_id_fkey"))
-
-    alter table(:products) do
-      modify(:selected_product_variant_id, :uuid)
-    end
-
     drop(table(:product_variants))
+
+    drop_if_exists(
+      unique_index(:products, [:handle, :archived_at], name: "products_handle_index")
+    )
 
     drop(table(:products))
   end
