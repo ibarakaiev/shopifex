@@ -265,8 +265,8 @@ defmodule Shopifex.CartsTest do
             type: unquote(type),
             product_variants: [
               %{
-                title: Atom.to_string(unquote(type)),
-                description: "Description",
+                title: "product_variant_title",
+                description: "product_variant_description",
                 price_variants: [
                   %{
                     price: Money.new(:USD, "39.99")
@@ -303,48 +303,44 @@ defmodule Shopifex.CartsTest do
 
       test "Cart.add_to_cart/1 adds a product variant to the cart", %{
         cart: cart,
-        dynamic_product: %{id: dynamic_product_id, hash: dynamic_product_hash},
-        product_variant: %{id: product_variant_id}
+        dynamic_product: %{hash: dynamic_product_hash},
+        product_variant: %{id: product_variant_id} = product_variant
       } do
-        assert [
-                 %CartItem{
-                   quantity: 1,
-                   product_variant_id: ^product_variant_id,
-                   display_product: %{id: ^dynamic_product_id},
-                   display_id: ^dynamic_product_hash
-                 }
-               ] =
-                 cart.cart_items
+        [cart_item] = cart.cart_items
+
+        assert %{
+                 quantity: 1,
+                 product_variant_id: ^product_variant_id,
+                 display_id: ^dynamic_product_hash
+               } = cart_item
+
+        # title and description should be fetched from the resource itself, not from the product variant
+        refute CartItem.display_title!(cart_item) == product_variant.title
+        refute CartItem.display_description!(cart_item) == product_variant.description
       end
 
       test "Cart.add_to_cart/1 increments a cart item's quantity if the product variant already exists in the cart",
            %{
              cart: cart,
-             dynamic_product: %{id: dynamic_product_id} = dynamic_product,
+             dynamic_product: dynamic_product,
              product_variant: %{id: product_variant_id} = product_variant
            } do
-        for _ <- 1..4, reduce: cart do
-          cart ->
-            cart =
-              Cart.add_to_cart!(cart, %{
-                product_variant: product_variant,
-                dynamic_product_id: dynamic_product.id,
-                product_type: unquote(type)
-              })
+        cart =
+          for _ <- 1..4, reduce: cart do
+            cart ->
+              cart =
+                Cart.add_to_cart!(cart, %{
+                  product_variant: product_variant,
+                  dynamic_product_id: dynamic_product.id,
+                  product_type: unquote(type)
+                })
 
-            cart
-        end
+              cart
+          end
 
-        cart = Ash.load!(cart, [:cart_items])
+        [cart_item] = cart.cart_items
 
-        assert [
-                 %CartItem{
-                   quantity: 5,
-                   product_variant_id: ^product_variant_id,
-                   display_product: %{id: ^dynamic_product_id}
-                 }
-               ] =
-                 cart.cart_items
+        assert %{quantity: 5, product_variant_id: ^product_variant_id} = cart_item
       end
 
       test "Cart.contains?/3 returns true if a cart contains a product and false otherwise", %{
