@@ -16,6 +16,22 @@ defmodule Shopifex.ProductsTest do
     description: "Description 1"
   }
 
+  @attribute_attrs %{
+    title: "Wrap",
+    alias: "wrap"
+  }
+
+  @first_attribute_option_attrs %{
+    value: :softcover,
+    text: "Softcover"
+  }
+
+  @second_attribute_option_attrs %{
+    value: :hardcover,
+    text: "Hardcover",
+    additional_charge: Money.new(:USD, "9.99")
+  }
+
   @price_variant_attrs %{
     price: Money.new(:USD, "39.99")
   }
@@ -42,6 +58,23 @@ defmodule Shopifex.ProductsTest do
               }
             ]
           }
+        ],
+        attributes: [
+          %{
+            title: @attribute_attrs[:title],
+            alias: @attribute_attrs[:alias],
+            options: [
+              %{
+                value: @first_attribute_option_attrs[:value],
+                text: @first_attribute_option_attrs[:text]
+              },
+              %{
+                value: @second_attribute_option_attrs[:value],
+                text: @second_attribute_option_attrs[:text],
+                additional_charge: @second_attribute_option_attrs[:additional_charge]
+              }
+            ]
+          }
         ]
       })
 
@@ -65,6 +98,16 @@ defmodule Shopifex.ProductsTest do
       display_price_variant = ProductVariant.display_price_variant!(display_product_variant)
 
       assert display_price_variant.product_id == product.id
+
+      assert [attribute] = product.attributes
+      assert [first_attribute_option, second_attribute_option] = attribute.options
+
+      assert is_nil(first_attribute_option.additional_charge)
+
+      assert Money.equal?(
+               second_attribute_option.additional_charge,
+               @second_attribute_option_attrs[:additional_charge]
+             )
     end
 
     test "add_product_variants/2 adds news product variants with new prices", %{

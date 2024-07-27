@@ -88,6 +88,23 @@ defmodule Shopifex.Repo.Migrations.Setup do
       add(:price_variant_id, :uuid, null: false, primary_key: true)
     end
 
+    create table(:product_attributes, primary_key: false) do
+      add(
+        :product_id,
+        references(:products,
+          column: :id,
+          name: "product_attributes_product_id_fkey",
+          type: :uuid,
+          prefix: "public",
+          on_delete: :delete_all
+        ),
+        primary_key: true,
+        null: false
+      )
+
+      add(:attribute_id, :uuid, null: false, primary_key: true)
+    end
+
     create table(:price_variants, primary_key: false) do
       add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
     end
@@ -262,9 +279,69 @@ defmodule Shopifex.Repo.Migrations.Setup do
              name: "cart_items_unique_cart_item_index",
              nulls_distinct: false
            )
+
+    create table(:attributes, primary_key: false) do
+      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+    end
+
+    alter table(:product_attributes) do
+      modify(
+        :attribute_id,
+        references(:attributes,
+          column: :id,
+          name: "product_attributes_attribute_id_fkey",
+          type: :uuid,
+          prefix: "public",
+          on_delete: :delete_all
+        )
+      )
+    end
+
+    alter table(:attributes) do
+      add(:title, :text, null: false)
+      add(:alias, :text, null: false)
+    end
+
+    create unique_index(:attributes, [:alias], name: "attributes_unique_alias_index")
+
+    create table(:attribute_options, primary_key: false) do
+      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
+      add(:value, :text, null: false)
+      add(:text, :text, null: false)
+      add(:additional_charge, :money_with_currency)
+
+      add(
+        :attribute_id,
+        references(:attributes,
+          column: :id,
+          name: "attribute_options_attribute_id_fkey",
+          type: :uuid,
+          prefix: "public"
+        )
+      )
+    end
   end
 
   def down do
+    drop(constraint(:attribute_options, "attribute_options_attribute_id_fkey"))
+
+    drop(table(:attribute_options))
+
+    drop_if_exists(unique_index(:attributes, [:alias], name: "attributes_unique_alias_index"))
+
+    alter table(:attributes) do
+      remove(:alias)
+      remove(:title)
+    end
+
+    drop(constraint(:product_attributes, "product_attributes_attribute_id_fkey"))
+
+    alter table(:product_attributes) do
+      modify(:attribute_id, :uuid)
+    end
+
+    drop(table(:attributes))
+
     drop_if_exists(
       unique_index(
         :cart_items,
@@ -338,6 +415,10 @@ defmodule Shopifex.Repo.Migrations.Setup do
     end
 
     drop(table(:price_variants))
+
+    drop(constraint(:product_attributes, "product_attributes_product_id_fkey"))
+
+    drop(table(:product_attributes))
 
     drop(
       constraint(

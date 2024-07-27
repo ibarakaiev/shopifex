@@ -11,76 +11,14 @@
       "type": "uuid"
     },
     {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "alias",
-      "type": "text"
-    },
-    {
       "allow_nil?": false,
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "title",
-      "type": "text"
-    },
-    {
-      "allow_nil?": false,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "description",
-      "type": "text"
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "image_urls",
-      "type": [
-        "array",
-        "text"
-      ]
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": {
-        "deferrable": false,
-        "destination_attribute": "id",
-        "destination_attribute_default": null,
-        "destination_attribute_generated": null,
-        "index?": false,
-        "match_type": null,
-        "match_with": null,
-        "multitenancy": {
-          "attribute": null,
-          "global": null,
-          "strategy": null
-        },
-        "name": "product_variants_selected_price_variant_id_fkey",
-        "on_delete": "nilify",
-        "on_update": null,
-        "primary_key?": true,
-        "schema": "public",
-        "table": "price_variants"
-      },
-      "size": null,
-      "source": "selected_price_variant_id",
-      "type": "uuid"
+      "source": "price",
+      "type": "money_with_currency"
     },
     {
       "allow_nil?": false,
@@ -103,7 +41,7 @@
       "type": "utc_datetime_usec"
     },
     {
-      "allow_nil?": false,
+      "allow_nil?": true,
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
@@ -120,7 +58,7 @@
           "global": null,
           "strategy": null
         },
-        "name": "product_variants_product_id_fkey",
+        "name": "price_variants_product_id_fkey",
         "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
@@ -147,12 +85,12 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "C19719FE0D703B2112A0FBFE259D5D44AD2E69745240A10DC177CBDD143E779D",
+  "hash": "068BE018C0800A894FC58062C7EC7ADC7D90C17328B8C90336064106F7DC8557",
   "identities": [
     {
       "all_tenants?": false,
       "base_filter": null,
-      "index_name": "product_variants_unique_alias_index",
+      "index_name": "price_variants_unique_product_price_index",
       "keys": [
         {
           "type": "atom",
@@ -160,10 +98,10 @@
         },
         {
           "type": "atom",
-          "value": "alias"
+          "value": "price"
         }
       ],
-      "name": "unique_alias",
+      "name": "unique_product_price",
       "nils_distinct?": true,
       "where": null
     }
@@ -175,5 +113,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "product_variants"
+  "table": "price_variants"
 }

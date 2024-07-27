@@ -54,10 +54,13 @@ defmodule Shopifex.Products.Product do
       accept [:handle, :type]
 
       argument :product_variants, {:array, :map}, allow_nil?: false
+      argument :attributes, {:array, :map}, allow_nil?: true
 
       change Changes.AddProductIdToProductVariants
 
       change manage_relationship(:product_variants, type: :create)
+
+      change manage_relationship(:attributes, on_lookup: :relate, on_no_match: :create)
     end
 
     update :add_product_variants do
@@ -68,6 +71,14 @@ defmodule Shopifex.Products.Product do
       change Changes.AddProductIdToProductVariants
 
       change manage_relationship(:product_variants, type: :create)
+    end
+
+    update :add_attributes do
+      require_atomic? false
+
+      argument :attributes, {:array, :map}, allow_nil?: false
+
+      change manage_relationship(:attributes, on_lookup: :relate, on_no_match: :create)
     end
 
     update :select_display_product_variant do
@@ -99,6 +110,10 @@ defmodule Shopifex.Products.Product do
     end
   end
 
+  preparations do
+    prepare build(load: [:attributes])
+  end
+
   attributes do
     uuid_primary_key :id
 
@@ -116,6 +131,13 @@ defmodule Shopifex.Products.Product do
   end
 
   relationships do
+    many_to_many :attributes, Shopifex.Products.Attribute do
+      through Shopifex.Products.ProductAttributes
+
+      source_attribute_on_join_resource :product_id
+      destination_attribute_on_join_resource :attribute_id
+    end
+
     has_many :product_variants, Shopifex.Products.ProductVariant
 
     belongs_to :selected_product_variant, Shopifex.Products.ProductVariant, public?: true

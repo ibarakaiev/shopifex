@@ -18,15 +18,15 @@
           "global": null,
           "strategy": null
         },
-        "name": "product_variant_price_variants_product_variant_id_fkey",
+        "name": "product_attributes_product_id_fkey",
         "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "product_variants"
+        "table": "products"
       },
       "size": null,
-      "source": "product_variant_id",
+      "source": "product_id",
       "type": "uuid"
     },
     {
@@ -47,15 +47,15 @@
           "global": null,
           "strategy": null
         },
-        "name": "product_variant_price_variants_price_variant_id_fkey",
+        "name": "product_attributes_attribute_id_fkey",
         "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "price_variants"
+        "table": "attributes"
       },
       "size": null,
-      "source": "price_variant_id",
+      "source": "attribute_id",
       "type": "uuid"
     }
   ],
@@ -64,7 +64,7 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "97A4A90B995F9DF2635790E3D3B8C5929E740E36FD493941B809BAEA751868F9",
+  "hash": "21A9421533CFE331AA7834621BC8DFFACD76B299B5BAA49A08E8AE8C7EE54701",
   "identities": [],
   "multitenancy": {
     "attribute": null,
@@ -73,5 +73,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "product_variant_price_variants"
+  "table": "product_attributes"
 }

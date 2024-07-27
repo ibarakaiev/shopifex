@@ -9,10 +9,13 @@ defmodule Shopifex.Products do
   end
 
   resources do
+    resource Shopifex.Products.Attribute
+    resource Shopifex.Products.AttributeOption
+    resource Shopifex.Products.PriceVariant
     resource Shopifex.Products.Product
+    resource Shopifex.Products.ProductAttributes
     resource Shopifex.Products.ProductVariant
     resource Shopifex.Products.ProductVariantPriceVariant
-    resource Shopifex.Products.PriceVariant
 
     # dynamic products can be configured in `config.exs` with either of the
     # following two formats:

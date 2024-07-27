@@ -12,16 +12,6 @@
     },
     {
       "allow_nil?": false,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "price",
-      "type": "money_with_currency"
-    },
-    {
-      "allow_nil?": false,
       "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
       "generated?": false,
       "primary_key?": false,
@@ -58,26 +48,26 @@
           "global": null,
           "strategy": null
         },
-        "name": "price_variants_product_id_fkey",
+        "name": "checkout_sessions_cart_id_fkey",
         "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "products"
+        "table": "carts"
       },
       "size": null,
-      "source": "product_id",
+      "source": "cart_id",
       "type": "uuid"
     },
     {
-      "allow_nil?": true,
-      "default": "nil",
+      "allow_nil?": false,
+      "default": "\"open\"",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "archived_at",
-      "type": "utc_datetime_usec"
+      "source": "state",
+      "type": "text"
     }
   ],
   "base_filter": null,
@@ -85,27 +75,8 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "2B5DD983CB3C011298A9048757337B3C480E941F96A8D15AF3E931B079806776",
-  "identities": [
-    {
-      "all_tenants?": false,
-      "base_filter": null,
-      "index_name": "price_variants_unique_product_price_index",
-      "keys": [
-        {
-          "type": "atom",
-          "value": "product_id"
-        },
-        {
-          "type": "atom",
-          "value": "price"
-        }
-      ],
-      "name": "unique_product_price",
-      "nils_distinct?": true,
-      "where": null
-    }
-  ],
+  "hash": "3D9F9DA14E30BD1BFF08F9B7FAADC8AA36E9F00D39826B91BB6CF6635E33882A",
+  "identities": [],
   "multitenancy": {
     "attribute": null,
     "global": null,
@@ -113,5 +84,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "price_variants"
+  "table": "checkout_sessions"
 }

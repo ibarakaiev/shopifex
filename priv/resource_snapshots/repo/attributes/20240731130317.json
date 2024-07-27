@@ -12,12 +12,22 @@
     },
     {
       "allow_nil?": false,
-      "default": "\"active\"",
+      "default": "nil",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "state",
+      "source": "title",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "primary_key?": false,
+      "references": null,
+      "size": null,
+      "source": "alias",
       "type": "text"
     }
   ],
@@ -26,8 +36,23 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "E491AC2C484D1D63BD5F6C0921BDFC62CCB4F7C7192F264C96EF39D74FA9091E",
-  "identities": [],
+  "hash": "2705F77070FB815C5D7CDA46DCA8034B3F08D27E063D8562D0481B3BEFDBFE36",
+  "identities": [
+    {
+      "all_tenants?": false,
+      "base_filter": null,
+      "index_name": "attributes_unique_alias_index",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "alias"
+        }
+      ],
+      "name": "unique_alias",
+      "nils_distinct?": true,
+      "where": null
+    }
+  ],
   "multitenancy": {
     "attribute": null,
     "global": null,
@@ -35,5 +60,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "carts"
+  "table": "attributes"
 }

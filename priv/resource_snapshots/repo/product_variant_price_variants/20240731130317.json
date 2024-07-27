@@ -2,39 +2,9 @@
   "attributes": [
     {
       "allow_nil?": false,
-      "default": "fragment(\"gen_random_uuid()\")",
-      "generated?": false,
-      "primary_key?": true,
-      "references": null,
-      "size": null,
-      "source": "id",
-      "type": "uuid"
-    },
-    {
-      "allow_nil?": false,
-      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "inserted_at",
-      "type": "utc_datetime_usec"
-    },
-    {
-      "allow_nil?": false,
-      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "updated_at",
-      "type": "utc_datetime_usec"
-    },
-    {
-      "allow_nil?": true,
       "default": "nil",
       "generated?": false,
-      "primary_key?": false,
+      "primary_key?": true,
       "references": {
         "deferrable": false,
         "destination_attribute": "id",
@@ -48,26 +18,45 @@
           "global": null,
           "strategy": null
         },
-        "name": "checkout_sessions_cart_id_fkey",
+        "name": "product_variant_price_variants_product_variant_id_fkey",
         "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "carts"
+        "table": "product_variants"
       },
       "size": null,
-      "source": "cart_id",
+      "source": "product_variant_id",
       "type": "uuid"
     },
     {
       "allow_nil?": false,
-      "default": "\"open\"",
+      "default": "nil",
       "generated?": false,
-      "primary_key?": false,
-      "references": null,
+      "primary_key?": true,
+      "references": {
+        "deferrable": false,
+        "destination_attribute": "id",
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null,
+        "index?": false,
+        "match_type": null,
+        "match_with": null,
+        "multitenancy": {
+          "attribute": null,
+          "global": null,
+          "strategy": null
+        },
+        "name": "product_variant_price_variants_price_variant_id_fkey",
+        "on_delete": "delete",
+        "on_update": null,
+        "primary_key?": true,
+        "schema": "public",
+        "table": "price_variants"
+      },
       "size": null,
-      "source": "state",
-      "type": "text"
+      "source": "price_variant_id",
+      "type": "uuid"
     }
   ],
   "base_filter": null,
@@ -75,7 +64,7 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "5F719FAA64D84C8E6ABAC24D4CC20CF74B513A5C2E54717BBF15B97C85CBF977",
+  "hash": "3FE58048997D9A70801B2FD0357CBC272D4F5486A4763F1B65C058A5374793B0",
   "identities": [],
   "multitenancy": {
     "attribute": null,
@@ -84,5 +73,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "checkout_sessions"
+  "table": "product_variant_price_variants"
 }
