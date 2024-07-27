@@ -7,6 +7,11 @@ defmodule Shopifex.Products.ProductVariantPriceVariant do
     table "product_variant_price_variants"
 
     repo Shopifex.Repo
+
+    references do
+      reference :product_variant, on_delete: :delete
+      reference :price_variant, on_delete: :delete
+    end
   end
 
   actions do

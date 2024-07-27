@@ -78,7 +78,8 @@ defmodule Shopifex.Repo.Migrations.Setup do
           column: :id,
           name: "product_variant_price_variants_product_variant_id_fkey",
           type: :uuid,
-          prefix: "public"
+          prefix: "public",
+          on_delete: :delete_all
         ),
         primary_key: true,
         null: false
@@ -126,7 +127,8 @@ defmodule Shopifex.Repo.Migrations.Setup do
           column: :id,
           name: "product_variant_price_variants_price_variant_id_fkey",
           type: :uuid,
-          prefix: "public"
+          prefix: "public",
+          on_delete: :delete_all
         )
       )
     end

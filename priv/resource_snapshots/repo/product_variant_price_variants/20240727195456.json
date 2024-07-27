@@ -19,7 +19,7 @@
           "strategy": null
         },
         "name": "product_variant_price_variants_product_variant_id_fkey",
-        "on_delete": null,
+        "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
@@ -48,7 +48,7 @@
           "strategy": null
         },
         "name": "product_variant_price_variants_price_variant_id_fkey",
-        "on_delete": null,
+        "on_delete": "delete",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
@@ -64,7 +64,7 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "1C92A5FA8871A7EA25179A9D5829869DCFFA60FA267BE67448C2A8707E97BF73",
+  "hash": "97A4A90B995F9DF2635790E3D3B8C5929E740E36FD493941B809BAEA751868F9",
   "identities": [],
   "multitenancy": {
     "attribute": null,
