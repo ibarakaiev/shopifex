@@ -199,15 +199,15 @@ defmodule Shopifex.CartsTest do
       assert {:error, _error} = CartItem.update_quantity(updated_cart_item, %{quantity: -1})
     end
 
-    test "CartItem.display_product/1 contains the correct product", %{
-      cart: cart,
-      product_variant: product_variant
-    } do
+    test "CartItem.display_title/1 and CartItem.display_description/1 contains the correct product",
+         %{
+           cart: cart,
+           product_variant: product_variant
+         } do
       [cart_item] = cart.cart_items
-      display_product = CartItem.display_product!(cart_item)
 
-      assert Product.title!(display_product) == product_variant.title
-      assert Product.description!(display_product) == product_variant.description
+      assert CartItem.display_title!(cart_item) == product_variant.title
+      assert CartItem.display_description!(cart_item) == product_variant.description
     end
 
     test "Cart.contains?/3 returns true if a cart contains a product and false otherwise", %{
@@ -263,33 +263,36 @@ defmodule Shopifex.CartsTest do
           %{
             handle: Atom.to_string(unquote(type)),
             type: unquote(type),
-            product_variants: [%{
-              title: Atom.to_string(unquote(type)),
-              description: "Description",
-              price_variants: [
-                %{
-                  price: Money.new(:USD, "39.99")
-                },
-                %{
-                  price: Money.new(:USD, "49.99")
-                }
-              ]
-            }]
+            product_variants: [
+              %{
+                title: Atom.to_string(unquote(type)),
+                description: "Description",
+                price_variants: [
+                  %{
+                    price: Money.new(:USD, "39.99")
+                  },
+                  %{
+                    price: Money.new(:USD, "49.99")
+                  }
+                ]
+              }
+            ]
           }
           |> Product.create!()
 
+        display_product_variant = Product.display_product_variant!(product)
+
+        dynamic_product = unquote(resource).create!()
+
         cart =
-          Cart.add_to_cart!(cart, 
+          Cart.add_to_cart!(
+            cart,
             %{
-              product_variant: product_variant,
+              product_variant: display_product_variant,
               dynamic_product_id: dynamic_product.id,
               product_type: unquote(type)
             }
           )
-
-        dynamic_product = unquote(resource).create!()
-
-        display_product_variant = Product.display_product_variant!(product)
 
         %{
           cart: cart,
@@ -300,8 +303,8 @@ defmodule Shopifex.CartsTest do
 
       test "Cart.add_to_cart/1 adds a product variant to the cart", %{
         cart: cart,
-        dynamic_product: %{id: dynamic_product_id, hash: dynamic_product_hash} = dynamic_product,
-        product_variant: %{id: product_variant_id} = product_variant
+        dynamic_product: %{id: dynamic_product_id, hash: dynamic_product_hash},
+        product_variant: %{id: product_variant_id}
       } do
         assert [
                  %CartItem{
@@ -324,11 +327,9 @@ defmodule Shopifex.CartsTest do
           cart ->
             cart =
               Cart.add_to_cart!(cart, %{
-                cart_item: %{
-                  product_variant: product_variant,
-                  dynamic_product_id: dynamic_product.id,
-                  product_type: unquote(type)
-                }
+                product_variant: product_variant,
+                dynamic_product_id: dynamic_product.id,
+                product_type: unquote(type)
               })
 
             cart
@@ -348,10 +349,9 @@ defmodule Shopifex.CartsTest do
 
       test "Cart.contains?/3 returns true if a cart contains a product and false otherwise", %{
         cart: cart,
-        dynamic_product: %{id: dynamic_product_id} = dynamic_product,
-        product_variant: product_variant
+        dynamic_product: dynamic_product
       } do
-        assert Cart.contains?(cart, unquote(type), dynamic_product_id)
+        assert Cart.contains?(cart, unquote(type), dynamic_product.id)
         assert not Cart.contains?(cart, unquote(type), "non-existent")
       end
     end

@@ -2,9 +2,12 @@ defmodule Shopifex.Carts.CartItem.Calculations.DisplayId do
   @moduledoc false
   use Ash.Resource.Calculation
 
+  alias Shopifex.Products.ProductVariant
+  alias Shopifex.Products.Enums.ProductType
+
   @impl true
   def load(_query, _opts, _context) do
-    [:product_type, :display_product]
+    [:product_type, :product_variant_id, :dynamic_product_id]
   end
 
   @impl true
@@ -12,16 +15,15 @@ defmodule Shopifex.Carts.CartItem.Calculations.DisplayId do
     Enum.map(cart_items, fn cart_item ->
       case cart_item.product_type do
         :static ->
-          {:ok, display_product} = Ash.load(cart_item.display_product, [:handle])
+          product_variant =
+            ProductVariant.get_by_id!(cart_item.product_variant_id, load: [:product])
 
-          # cart_item may have the same products but different product variants or price variants,
-          # so to prevent collision (and anonymize price variant ids) we add a random string
-          display_product.handle <> "_" <> random_string(8)
+          product_variant.product.handle <> "_" <> random_string(8)
 
-        _product_type ->
-          {:ok, display_product} = Ash.load(cart_item.display_product, [:hash])
+        product_type ->
+          resource = ProductType.to_resource(product_type)
 
-          display_product.hash
+          resource.get_by_id!(cart_item.dynamic_product_id).hash
       end
     end)
   end

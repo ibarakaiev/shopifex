@@ -142,7 +142,6 @@ defmodule Shopifex.Products.Product do
     calculate :price, AshMoney.Types.Money, Calculations.Price do
       argument :price_variant_id, :uuid, allow_nil?: true
     end
-
   end
 
   identities do

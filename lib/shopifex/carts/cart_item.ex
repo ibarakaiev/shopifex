@@ -30,7 +30,8 @@ defmodule Shopifex.Carts.CartItem do
     define :read_all, action: :read
     define :destroy, action: :destroy
     define :get_by_id, action: :by_id, args: [:id]
-    define_calculation :display_product, args: [:_record]
+    define_calculation :display_title, args: [:_record]
+    define_calculation :display_description, args: [:_record]
     define_calculation :subtotal, args: [:_record]
     define_calculation :compare_at_subtotal, args: [:_record]
   end
@@ -140,7 +141,8 @@ defmodule Shopifex.Carts.CartItem do
   end
 
   calculations do
-    calculate :display_product, Shopifex.Products.ProductUnion, Calculations.DisplayProduct
+    calculate :display_title, :string, Calculations.DisplayTitle
+    calculate :display_description, :string, Calculations.DisplayDescription
     calculate :display_id, :string, Calculations.DisplayId
     calculate :subtotal, AshMoney.Types.Money, Calculations.Subtotal
     calculate :compare_at_subtotal, AshMoney.Types.Money, Calculations.CompareAtSubtotal
