@@ -5,12 +5,14 @@ defmodule Shopifex.Products.PriceVariant do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshArchival.Resource]
 
-  alias __MODULE__
-
   postgres do
     repo Shopifex.Repo
 
     table "price_variants"
+
+    references do
+      reference :product, on_delete: :delete
+    end
   end
 
   code_interface do
@@ -48,8 +50,6 @@ defmodule Shopifex.Products.PriceVariant do
     uuid_primary_key :id
 
     attribute :price, AshMoney.Types.Money, allow_nil?: false, public?: true
-
-    attribute :add_ons, {:array, PriceVariant.AddOn}, public?: true
 
     timestamps()
   end

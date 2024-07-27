@@ -11,13 +11,13 @@
       "type": "uuid"
     },
     {
-      "allow_nil?": true,
-      "default": "nil",
+      "allow_nil?": false,
+      "default": "\"draft\"",
       "generated?": false,
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "alias",
+      "source": "status",
       "type": "text"
     },
     {
@@ -27,7 +27,7 @@
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "title",
+      "source": "handle",
       "type": "text"
     },
     {
@@ -37,50 +37,8 @@
       "primary_key?": false,
       "references": null,
       "size": null,
-      "source": "description",
+      "source": "type",
       "type": "text"
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": null,
-      "size": null,
-      "source": "image_urls",
-      "type": [
-        "array",
-        "text"
-      ]
-    },
-    {
-      "allow_nil?": true,
-      "default": "nil",
-      "generated?": false,
-      "primary_key?": false,
-      "references": {
-        "deferrable": false,
-        "destination_attribute": "id",
-        "destination_attribute_default": null,
-        "destination_attribute_generated": null,
-        "index?": false,
-        "match_type": null,
-        "match_with": null,
-        "multitenancy": {
-          "attribute": null,
-          "global": null,
-          "strategy": null
-        },
-        "name": "product_variants_selected_price_variant_id_fkey",
-        "on_delete": "nilify",
-        "on_update": null,
-        "primary_key?": true,
-        "schema": "public",
-        "table": "price_variants"
-      },
-      "size": null,
-      "source": "selected_price_variant_id",
-      "type": "uuid"
     },
     {
       "allow_nil?": false,
@@ -103,7 +61,7 @@
       "type": "utc_datetime_usec"
     },
     {
-      "allow_nil?": false,
+      "allow_nil?": true,
       "default": "nil",
       "generated?": false,
       "primary_key?": false,
@@ -120,15 +78,15 @@
           "global": null,
           "strategy": null
         },
-        "name": "product_variants_product_id_fkey",
-        "on_delete": "delete",
+        "name": "products_selected_product_variant_id_fkey",
+        "on_delete": "nilify",
         "on_update": null,
         "primary_key?": true,
         "schema": "public",
-        "table": "products"
+        "table": "product_variants"
       },
       "size": null,
-      "source": "product_id",
+      "source": "selected_product_variant_id",
       "type": "uuid"
     },
     {
@@ -147,24 +105,24 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "21675D5739A4C7C1F843ABE5AF4C98CF22921BE06828D057F3C1597554F5C0F2",
+  "hash": "1861F9E4B1D40877E799DBD85AD117BD3E9C9F062DD488FBEA8A0F5609782291",
   "identities": [
     {
       "all_tenants?": false,
       "base_filter": null,
-      "index_name": "product_variants_unique_alias_index",
+      "index_name": "products_handle_index",
       "keys": [
         {
           "type": "atom",
-          "value": "product_id"
+          "value": "handle"
         },
         {
           "type": "atom",
-          "value": "alias"
+          "value": "archived_at"
         }
       ],
-      "name": "unique_alias",
-      "nils_distinct?": true,
+      "name": "handle",
+      "nils_distinct?": false,
       "where": null
     }
   ],
@@ -175,5 +133,5 @@
   },
   "repo": "Elixir.Shopifex.Repo",
   "schema": null,
-  "table": "product_variants"
+  "table": "products"
 }

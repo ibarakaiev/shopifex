@@ -141,10 +141,14 @@ defmodule Shopifex.ProductsTest do
       assert Product.display_product_variant!(product, original_display_product_variant_id).id ==
                original_display_product_variant_id
 
-      assert Product.title!(product, original_display_product_variant_id) == @product_variant_attrs[:title]
+      assert Product.title!(product, original_display_product_variant_id) ==
+               @product_variant_attrs[:title]
+
       refute Product.title!(product) == @product_variant_attrs[:title]
 
-      assert Product.description!(product, original_display_product_variant_id) == @product_variant_attrs[:description]
+      assert Product.description!(product, original_display_product_variant_id) ==
+               @product_variant_attrs[:description]
+
       refute Product.description!(product) == @product_variant_attrs[:description]
     end
   end
@@ -189,14 +193,17 @@ defmodule Shopifex.ProductsTest do
       assert ProductVariant.display_price_variant!(product_variant, lowest_price_variant.id).id ==
                lowest_price_variant.id
 
-      refute Product.price!(product) == @price_variant_attrs[:price] 
-      assert Product.price!(product, lowest_price_variant.id) == @price_variant_attrs[:price] 
+      refute Product.price!(product) == @price_variant_attrs[:price]
+      assert Product.price!(product, lowest_price_variant.id) == @price_variant_attrs[:price]
     end
   end
 
   for {_type, resource} <- ProductType.dynamic_type_resource_pairs() do
     @tag resource: resource
-    test "implements subtotal!/2", %{resource: resource} do
+    test "implements subtotal!/1,2", %{resource: resource} do
+      # without an optional price_variant_id
+      assert function_exported?(resource, :subtotal, 1)
+      # with a price_variant_id
       assert function_exported?(resource, :subtotal, 2)
     end
 
