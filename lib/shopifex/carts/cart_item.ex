@@ -32,7 +32,7 @@ defmodule Shopifex.Carts.CartItem do
     define :get_by_id, action: :by_id, args: [:id]
     define_calculation :display_product, args: [:_record]
     define_calculation :subtotal, args: [:_record]
-    define_calculation :compare_at_subtotal, args: [:_record, :price_variant_id]
+    define_calculation :compare_at_subtotal, args: [:_record]
   end
 
   actions do
