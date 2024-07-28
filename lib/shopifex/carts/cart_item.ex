@@ -94,7 +94,7 @@ defmodule Shopifex.Carts.CartItem do
 
   preparations do
     prepare build(sort: [inserted_at: :asc])
-    prepare build(load: [:display_id])
+    prepare build(load: [:display_id, :product_variant])
   end
 
   changes do

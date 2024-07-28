@@ -46,12 +46,12 @@ defmodule Shopifex.Products.Product do
   end
 
   actions do
-    defaults [:read, :destroy, update: :*]
+    defaults [:read, :destroy]
 
     create :create do
       primary? true
 
-      accept :*
+      accept [:handle, :type]
 
       argument :product_variants, {:array, :map}, allow_nil?: false
 
