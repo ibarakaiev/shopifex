@@ -3,31 +3,30 @@ defmodule Shopifex.Carts.CartItem.Calculations.CompareAtSubtotal do
   use Ash.Resource.Calculation
 
   alias Shopifex.Carts.CartItem
+  alias Shopifex.Products.ProductVariant
+  alias Shopifex.Products.PriceVariant
 
   @impl true
   def load(_query, _opts, _context) do
     []
   end
 
+  # TODO: test this calculation
   @impl true
   def calculate(cart_items, _opts, _arguments) do
     Enum.map(cart_items, fn cart_item ->
-      price_variant = cart_item.product_variant.display_price_variant
+      product_variant = ProductVariant.get_by_id!(cart_item.product_variant_id)
 
-      case price_variant.compare_at_price do
-        nil ->
-          nil
+      price = PriceVariant.get_by_id!(cart_item.price_variant_id).price
+      compare_at_price = ProductVariant.compare_at_price!(product_variant)
 
-        # subtotal may be higher than the compare-at price due to add-ons,
-        # so we need to add the original difference between the base price and
-        # the compare-at price to the actual subtotal
-        _compare_at_price ->
-          diff =
-            price_variant.compare_at_price
-            |> Money.sub!(price_variant.price)
-            |> Money.mult!(cart_item.quantity)
+      unless Money.equal?(price, compare_at_price) do
+        diff =
+          compare_at_price
+          |> Money.sub!(price)
+          |> Money.mult!(cart_item.quantity)
 
-          Money.add!(diff, CartItem.subtotal!(cart_item))
+        Money.add!(diff, CartItem.subtotal!(cart_item))
       end
     end)
   end
