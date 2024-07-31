@@ -19,18 +19,19 @@ defmodule Shopifex.Fireside do
   def setup(igniter) do
     otp_app = Igniter.Project.Application.app_name()
 
-    imported_ash_domains = [Shopifex.Products, Shopifex.Carts, Shopifex.Checkouts]
-
-    igniter
-    |> Igniter.Project.Config.configure(
-      "config.exs",
-      otp_app,
-      [:ash_domains],
-      imported_ash_domains,
-      updater: fn zipper ->
-        Igniter.Code.List.append_new_to_list(zipper, imported_ash_domains)
-      end
-    )
+    [Shopifex.Products, Shopifex.Carts, Shopifex.Checkouts]
+    |> Enum.reduce(igniter, fn domain, igniter ->
+      Igniter.Project.Config.configure(
+        igniter,
+        "config.exs",
+        otp_app,
+        [:ash_domains],
+        [domain],
+        updater: fn zipper ->
+          Igniter.Code.List.append_new_to_list(zipper, domain)
+        end
+      )
+    end)
     |> Igniter.Project.Config.configure_new(
       "config.exs",
       otp_app,
