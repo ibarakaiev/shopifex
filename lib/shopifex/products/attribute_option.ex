@@ -16,7 +16,7 @@ defmodule Shopifex.Products.AttributeOption do
   attributes do
     uuid_primary_key :id
 
-    attribute :value, :atom, allow_nil?: false, public?: true
+    attribute :value, :string, allow_nil?: false, public?: true
     attribute :text, :string, allow_nil?: false, public?: true
     attribute :additional_charge, AshMoney.Types.Money, allow_nil?: true, public?: true
   end
