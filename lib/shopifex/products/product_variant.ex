@@ -42,7 +42,7 @@ defmodule Shopifex.Products.ProductVariant do
   end
 
   actions do
-    defaults [:read, :destroy, update: [:alias]]
+    defaults [:read, :destroy, update: [:title, :description, :alias, :image_urls]]
 
     create :create do
       primary? true
