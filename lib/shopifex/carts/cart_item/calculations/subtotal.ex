@@ -6,7 +6,7 @@ defmodule Shopifex.Carts.CartItem.Calculations.Subtotal do
 
   @impl true
   def load(_query, _opts, _context) do
-    [:quantity, :product_variant_id, :price_variant_id]
+    [:quantity, :product_variant_id, :price_variant_id, :product_type]
   end
 
   @impl true
