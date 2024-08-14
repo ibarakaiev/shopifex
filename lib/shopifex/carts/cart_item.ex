@@ -112,16 +112,17 @@ defmodule Shopifex.Carts.CartItem do
   attributes do
     uuid_primary_key :id
 
-    attribute :quantity, :integer, allow_nil?: false, default: 1
+    attribute :quantity, :integer, allow_nil?: false, default: 1, public?: true
 
     # If :product_type == :static, the :product is loaded via the associated
     # :product_variant (and :dynamic_product_id is nil). Otherwise, the
     # :product is loaded depending on its type.
     attribute :product_type, Shopifex.Products.Enums.ProductType,
       allow_nil?: false,
-      default: :static
+      default: :static,
+      public?: true
 
-    attribute :dynamic_product_id, :uuid, allow_nil?: true
+    attribute :dynamic_product_id, :uuid, allow_nil?: true, public?: true
 
     timestamps()
   end

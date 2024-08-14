@@ -11,7 +11,8 @@ mix fireside.install shopifex@github:ibarakaiev/shopifex
 
 ## Admin panel
 
-Shopifex enables `ash_admin`. If you use `Phoenix`, follow the
+Shopifex enables `ash_admin`. If you use
+[Phoenix](https://phoenixframework.org), follow the
 [`AshAdmin`](https://hexdocs.pm/ash_admin/getting-started-with-ash-admin.html)
 tutorial to enable the admin routes in your app.
 
@@ -194,6 +195,9 @@ classDiagram
     }
     class CartItem {
         UUID id
+        Integer quantity
+        ProductType product_type
+        UUID dynamic_product_id
         UUID cart_id
         UUID product_variant_id
         UUID price_variant_id
