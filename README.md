@@ -1,8 +1,9 @@
 # Shopifex
 
-Shopifex is an example [Fireside](https://github.com/ibarakaiev/fireside)
+Shopifex is a [Fireside](https://github.com/ibarakaiev/fireside)
 component that implements e-commerce functionality. To install
-it, make sure to add `:fireside` to your list of dependencies and run:
+it in your Elixir app, make sure to add `:fireside` to your list of
+dependencies and run:
 
 ```
 mix fireside.install shopifex@github:ibarakaiev/shopifex
@@ -13,6 +14,10 @@ mix fireside.install shopifex@github:ibarakaiev/shopifex
 Shopifex enables `ash_admin`. If you use `Phoenix`, follow the
 [`AshAdmin`](https://hexdocs.pm/ash_admin/getting-started-with-ash-admin.html)
 tutorial to enable the admin routes in your app.
+
+## Usage
+
+Consult the tests to see example usage.
 
 ## Resources
 
@@ -238,3 +243,4 @@ classDiagram
 Shopifex doesn't make assumptions about how orders are placed, tracked, and
 fulfilled. It is recommended to create a new `Orders` domain which will contain
 orders created from successful checkout sessions.
+
