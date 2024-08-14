@@ -1,19 +1,23 @@
-defmodule Shopifex.Fireside do
+defmodule Shopifex.FiresideComponent do
   def config do
-    %{
-      lib: [
-        "lib/shopifex/products.ex",
-        "lib/shopifex/products/**/*.{ex,exs}",
-        "lib/shopifex/carts.ex",
-        "lib/shopifex/carts/**/*.{ex,exs}",
-        "lib/shopifex/checkouts.ex",
-        "lib/shopifex/checkouts/**/*.{ex,exs}"
-      ],
-      tests: [
-        "test/shopifex/**/*_test.{ex,exs}"
-      ],
-      test_supports: []
-    }
+    [
+      name: :shopifex,
+      version: 2,
+      files: [
+        required: [
+          "lib/shopifex/products.ex",
+          "lib/shopifex/products/**/*.{ex,exs}",
+          "lib/shopifex/carts.ex",
+          "lib/shopifex/carts/**/*.{ex,exs}",
+          "lib/shopifex/checkouts.ex",
+          "lib/shopifex/checkouts/**/*.{ex,exs}",
+          "test/shopifex/**/*_test.{ex,exs}"
+        ],
+        optional: [
+          "lib/shopifex_web/endpoint.ex"
+        ]
+      ]
+    ]
   end
 
   def setup(igniter) do
@@ -38,5 +42,7 @@ defmodule Shopifex.Fireside do
       [:shopifex_dynamic_products],
       %{}
     )
+    |> Ash.Igniter.codegen("setup_shopifex")
+    |> Igniter.add_notice("Make sure to run `mix ash.migrate`.")
   end
 end

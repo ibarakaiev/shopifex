@@ -25,19 +25,16 @@ defmodule Shopifex.MixProject do
 
   defp deps do
     [
-      {:igniter, "~> 0.3"},
       {:ash, "~> 3.0"},
       {:ash_postgres, "~> 2.0"},
       {:ash_money, "~> 0.1"},
       {:ash_admin, "~> 0.11"},
       {:ash_archival, "~> 1.0"},
       {:ash_state_machine, "~> 0.2.5"},
-      {:ex_money_sql, "~> 1.0"},
-      {:picosat_elixir, "~> 0.2"},
-
-      # testing
-      {:smokestack, "~> 0.9"},
-      {:faker, "~> 0.18"}
+      {:igniter, path: "../igniter", override: true, optional: true},
+      {:ex_money_sql, "~> 1.0", optional: true},
+      {:picosat_elixir, "~> 0.2", optional: true},
+      {:styler, "~> 1.0.0-rc.1", only: [:dev, :test], runtime: false, optional: true}
     ]
   end
 

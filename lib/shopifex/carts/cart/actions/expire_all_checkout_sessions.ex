@@ -5,9 +5,7 @@ defmodule Shopifex.Carts.Cart.Actions.ExpireAllCheckoutSessions do
   alias Shopifex.Carts.Cart
   alias Shopifex.Checkouts.CheckoutSession
 
-  def update(changeset, _opts, _context) do
-    cart = changeset.data
-
+  def update(%{data: cart}, _opts, _context) do
     {:ok, %Cart{checkout_sessions: checkout_sessions}} = Ash.load(cart, [:checkout_sessions])
 
     for checkout_session <- checkout_sessions, checkout_session.state == :open do
