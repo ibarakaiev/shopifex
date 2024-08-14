@@ -6,12 +6,12 @@ defmodule Shopifex.FiresideComponent do
       files: [
         required: [
           "lib/shopifex/products.ex",
-          "lib/shopifex/products/**/*.{ex,exs}",
+          "lib/shopifex/products/**/*.ex",
           "lib/shopifex/carts.ex",
-          "lib/shopifex/carts/**/*.{ex,exs}",
+          "lib/shopifex/carts/**/*.ex",
           "lib/shopifex/checkouts.ex",
-          "lib/shopifex/checkouts/**/*.{ex,exs}",
-          "test/shopifex/**/*_test.{ex,exs}"
+          "lib/shopifex/checkouts/**/*.ex",
+          "test/shopifex/**/*_test.exs"
         ],
         optional: [
           "lib/shopifex_web/endpoint.ex"
