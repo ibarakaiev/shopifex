@@ -2,7 +2,7 @@ defmodule Shopifex.FiresideComponent do
   def config do
     [
       name: :shopifex,
-      version: 2,
+      version: 1,
       files: [
         required: [
           "lib/shopifex/products.ex",
