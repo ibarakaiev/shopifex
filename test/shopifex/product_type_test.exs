@@ -1,4 +1,4 @@
-defmodule Shopifex.Products.ProductTypeTest do
+defmodule Shopifex.ProductTypeTest do
   use ExUnit.Case
 
   alias Shopifex.Products.Enums.ProductType
