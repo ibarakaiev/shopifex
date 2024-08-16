@@ -9,6 +9,10 @@ dependencies and run:
 mix fireside.install shopifex@github:ibarakaiev/shopifex
 ```
 
+> [!NOTE]
+> You need to have a supervision tree in your Elixir app for Shopifex to work.
+> If you are creating a new Mix project, make sure to pass the `--sup` flag.
+
 ## Admin panel
 
 Shopifex enables `ash_admin`. If you use
