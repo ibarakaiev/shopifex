@@ -1,6 +1,6 @@
 defmodule Shopifex.Products.Definitions do
   def dynamic_products do
-    Application.fetch_env!(:shopifex, :shopifex_dynamic_products)
+    Application.fetch_env!(:shopifex, :dynamic_products)
   end
 
   def dynamic_product_handles do

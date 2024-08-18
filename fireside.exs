@@ -39,7 +39,7 @@ defmodule Shopifex.FiresideComponent do
     |> Igniter.Project.Config.configure_new(
       "config.exs",
       otp_app,
-      [:shopifex_dynamic_products],
+      [:dynamic_products],
       %{}
     )
     |> Ash.Igniter.codegen("setup_shopifex")
