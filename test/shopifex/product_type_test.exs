@@ -4,7 +4,7 @@ defmodule Shopifex.ProductTypeTest do
   alias Shopifex.Products.Enums.ProductType
 
   test "ProductType works with defined modules" do
-    for {handle, module} <- Shopifex.Products.Definitions.dynamic_products() do
+    for {handle, %{primary: module}} <- Shopifex.Products.Definitions.dynamic_products() do
       assert ProductType.to_resource(handle) == module
       assert function_exported?(module, :__info__, 1)
     end
