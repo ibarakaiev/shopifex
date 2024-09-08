@@ -12,6 +12,7 @@ defmodule Shopifex.Products.Definitions do
     |> Map.values()
     |> Enum.flat_map(fn
       %{primary: primary, nested: nested} -> [primary, nested]
+      %{primary: primary} -> [primary]
       module when is_atom(module) -> module
     end)
   end
