@@ -10,7 +10,7 @@ defmodule Shopifex.Products.Enums.ProductType do
 
       _ ->
         case Shopifex.Products.Definitions.dynamic_products()[type] do
-          %{primary: module, nested: _rest} -> module
+          %{primary: module} -> module
           module -> module
         end
     end
