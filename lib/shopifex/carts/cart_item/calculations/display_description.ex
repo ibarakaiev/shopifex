@@ -21,7 +21,7 @@ defmodule Shopifex.Carts.CartItem.Calculations.DisplayDescription do
         product_type ->
           resource = ProductType.to_resource(product_type)
 
-          resource.get_by_id!(cart_item.dynamic_product_id).description
+          cart_item.dynamic_product_id |> resource.get_by_id!() |> resource.display_description!()
       end
     end)
   end
