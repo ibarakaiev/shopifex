@@ -21,7 +21,7 @@ defmodule Shopifex.FiresideComponent do
   end
 
   def setup(igniter) do
-    otp_app = Igniter.Project.Application.app_name()
+    otp_app = Igniter.Project.Application.app_name(igniter)
 
     [Shopifex.Products, Shopifex.Carts, Shopifex.Checkouts]
     |> Enum.reduce(igniter, fn domain, igniter ->

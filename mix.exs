@@ -31,7 +31,7 @@ defmodule Shopifex.MixProject do
       {:ash_admin, "~> 0.11"},
       {:ash_archival, "~> 1.0"},
       {:ash_state_machine, "~> 0.2.5"},
-      {:igniter, path: "../igniter", override: true, optional: true},
+      {:igniter, "~> 0.0"},
       {:ex_money_sql, "~> 1.0", optional: true},
       {:picosat_elixir, "~> 0.2", optional: true},
       {:styler, "~> 1.0.0-rc.1", only: [:dev, :test], runtime: false, optional: true}
