@@ -27,7 +27,7 @@ defmodule Shopifex.Products.ProductVariant do
     define :read_all, action: :read
     define :get_by_id, action: :by_id, args: [:id]
 
-    define :add_price_variant, action: :add_price_variant, args: [:price_variant]
+    define :add_price_variant, action: :add_price_variant, args: [:price_variants]
 
     define :select_display_price_variant,
       action: :select_display_price_variant,
