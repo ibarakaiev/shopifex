@@ -259,5 +259,10 @@ defmodule Shopifex.ProductsTest do
     test "implements display_description!/1", %{resource: resource} do
       assert function_exported?(resource, :display_description, 1)
     end
+
+    @tag resource: resource
+    test "implements display_image!/1", %{resource: resource} do
+      assert function_exported?(resource, :display_image, 1)
+    end
   end
 end

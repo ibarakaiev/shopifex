@@ -32,6 +32,7 @@ defmodule Shopifex.Carts.CartItem do
     define :get_by_id, action: :by_id, args: [:id]
     define_calculation :display_title, args: [:_record]
     define_calculation :display_description, args: [:_record]
+    define_calculation :display_image, args: [:_record]
     define_calculation :subtotal, args: [:_record]
     define_calculation :compare_at_subtotal, args: [:_record]
   end
@@ -144,6 +145,7 @@ defmodule Shopifex.Carts.CartItem do
   calculations do
     calculate :display_title, :string, Calculations.DisplayTitle
     calculate :display_description, :string, Calculations.DisplayDescription
+    calculate :display_image, :string, Calculations.DisplayImage
     calculate :display_id, :string, Calculations.DisplayId
     calculate :subtotal, AshMoney.Types.Money, Calculations.Subtotal
     calculate :compare_at_subtotal, AshMoney.Types.Money, Calculations.CompareAtSubtotal
