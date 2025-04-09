@@ -5,7 +5,7 @@ defmodule Shopifex.Products do
   alias __MODULE__
 
   admin do
-    show?(true)
+    show? true
   end
 
   resources do
