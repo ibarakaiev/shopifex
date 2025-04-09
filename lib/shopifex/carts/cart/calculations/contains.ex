@@ -8,14 +8,18 @@ defmodule Shopifex.Carts.Cart.Calculations.Contains do
   end
 
   @impl true
-  def calculate(carts, _opts, %{arguments: %{product_type: :static, id: product_variant_id}}) do
+  def calculate(carts, _opts, %{
+        arguments: %{product_type: :static, product_id: product_variant_id}
+      }) do
     Enum.map(carts, fn cart ->
       Enum.any?(cart.cart_items, &(&1.product_variant_id == product_variant_id))
     end)
   end
 
   @impl true
-  def calculate(carts, _opts, %{arguments: %{product_type: _product_type, id: dynamic_product_id}}) do
+  def calculate(carts, _opts, %{
+        arguments: %{product_type: _product_type, product_id: dynamic_product_id}
+      }) do
     Enum.map(carts, fn cart ->
       Enum.any?(cart.cart_items, &(&1.dynamic_product_id == dynamic_product_id))
     end)

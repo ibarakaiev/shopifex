@@ -42,7 +42,7 @@ defmodule Shopifex.Carts.Cart do
     define :get_by_id, args: [:id], action: :by_id
 
     define_calculation :active_checkout_session, args: [:_record]
-    define_calculation :contains?, args: [:_record, :product_type, :id]
+    define_calculation :contains?, args: [:_record, :product_type, :product_id]
     define_calculation :empty?, args: [:_record]
     define_calculation :subtotal, args: [:_record]
   end
@@ -137,7 +137,7 @@ defmodule Shopifex.Carts.Cart do
 
     calculate :contains?, :boolean, Calculations.Contains do
       argument :product_type, :atom, allow_nil?: false
-      argument :id, :uuid, allow_nil?: false
+      argument :product_id, :uuid, allow_nil?: false
     end
 
     calculate :empty?, AshMoney.Types.Money, Calculations.Empty

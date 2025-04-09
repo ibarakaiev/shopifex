@@ -215,7 +215,7 @@ defmodule Shopifex.CartsTest do
       product_variant: product_variant
     } do
       assert Cart.contains?(cart, :static, product_variant.id)
-      refute Cart.contains?(cart, :static, "non-existent")
+      refute Cart.contains?(cart, :static, "0f8d71a6-6b2f-4e83-b8a2-8743d83fbf63")
     end
 
     test "Cart.subtotal/1 contains correct subtotal", %{
@@ -348,7 +348,7 @@ defmodule Shopifex.CartsTest do
         dynamic_product: dynamic_product
       } do
         assert Cart.contains?(cart, unquote(type), dynamic_product.id)
-        assert not Cart.contains?(cart, unquote(type), "non-existent")
+        assert not Cart.contains?(cart, unquote(type), "0f8d71a6-6b2f-4e83-b8a2-8743d83fbf63")
       end
     end
   end
