@@ -241,9 +241,9 @@ defmodule Shopifex.ProductsTest do
     end
   end
 
-  for {_type, resource} <- ProductType.dynamic_type_resource_pairs() do
+  for {type, resource} <- ProductType.dynamic_type_resource_pairs() do
     @tag resource: resource
-    test "implements subtotal!/1,2", %{resource: resource} do
+    test "#{type} implements subtotal!/1,2", %{resource: resource} do
       # without an optional price_variant_id
       assert function_exported?(resource, :subtotal, 1)
       # with a price_variant_id
@@ -251,17 +251,17 @@ defmodule Shopifex.ProductsTest do
     end
 
     @tag resource: resource
-    test "implements display_title!/1", %{resource: resource} do
+    test "#{type} implements display_title!/1", %{resource: resource} do
       assert function_exported?(resource, :display_title, 1)
     end
 
     @tag resource: resource
-    test "implements display_description!/1", %{resource: resource} do
+    test "#{type} implements display_description!/1", %{resource: resource} do
       assert function_exported?(resource, :display_description, 1)
     end
 
     @tag resource: resource
-    test "implements display_image!/1", %{resource: resource} do
+    test "#{type} implements display_image!/1", %{resource: resource} do
       assert function_exported?(resource, :display_image, 1)
     end
   end

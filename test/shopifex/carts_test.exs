@@ -301,7 +301,7 @@ defmodule Shopifex.CartsTest do
         }
       end
 
-      test "Cart.add_to_cart/1 adds a product variant to the cart", %{
+      test "Cart.add_to_cart/1 adds a product variant to the cart (#{type})", %{
         cart: cart,
         dynamic_product: %{hash: dynamic_product_hash},
         product_variant: %{id: product_variant_id} = product_variant
@@ -319,7 +319,7 @@ defmodule Shopifex.CartsTest do
         refute CartItem.display_description!(cart_item) == product_variant.description
       end
 
-      test "Cart.add_to_cart/1 increments a cart item's quantity if the product variant already exists in the cart",
+      test "Cart.add_to_cart/1 increments a cart item's quantity if the product variant already exists in the cart (#{type})",
            %{
              cart: cart,
              dynamic_product: dynamic_product,
@@ -343,10 +343,11 @@ defmodule Shopifex.CartsTest do
         assert %{quantity: 5, product_variant_id: ^product_variant_id} = cart_item
       end
 
-      test "Cart.contains?/3 returns true if a cart contains a product and false otherwise", %{
-        cart: cart,
-        dynamic_product: dynamic_product
-      } do
+      test "Cart.contains?/3 returns true if a cart contains a product and false otherwise (#{type})",
+           %{
+             cart: cart,
+             dynamic_product: dynamic_product
+           } do
         assert Cart.contains?(cart, unquote(type), dynamic_product.id)
         assert not Cart.contains?(cart, unquote(type), "0f8d71a6-6b2f-4e83-b8a2-8743d83fbf63")
       end
