@@ -18,11 +18,11 @@ defmodule Shopifex.Carts.Cart do
   end
 
   state_machine do
-    initial_states([:active])
-    default_initial_state(:active)
+    initial_states [:active]
+    default_initial_state :active
 
     transitions do
-      transition(:complete_checkout, from: :active, to: :order_created)
+      transition :complete_checkout, from: :active, to: :order_created
     end
   end
 

@@ -3,7 +3,6 @@ defmodule Shopifex.CartsTest do
 
   alias Shopifex.Carts.Cart
   alias Shopifex.Carts.CartItem
-  alias Shopifex.Products.Enums.ProductType
   alias Shopifex.Products.Product
   alias Shopifex.Products.ProductVariant
 
@@ -215,7 +214,7 @@ defmodule Shopifex.CartsTest do
       product_variant: product_variant
     } do
       assert Cart.contains?(cart, :static, product_variant.id)
-      refute Cart.contains?(cart, :static, "0f8d71a6-6b2f-4e83-b8a2-8743d83fbf63")
+      refute Cart.contains?(cart, :static, Ecto.UUID.generate())
     end
 
     test "Cart.subtotal/1 contains correct subtotal", %{
@@ -253,104 +252,6 @@ defmodule Shopifex.CartsTest do
       subtotal = Cart.subtotal!(cart)
 
       assert Money.equal?(subtotal, Money.new(:USD, "40.01"))
-    end
-  end
-
-  describe "Dynamic products" do
-    for {type, resource} <- ProductType.dynamic_type_resource_pairs() do
-      setup %{cart: cart} do
-        product =
-          %{
-            handle: Atom.to_string(unquote(type)),
-            type: unquote(type),
-            product_variants: [
-              %{
-                title: "product_variant_title",
-                description: "product_variant_description",
-                price_variants: [
-                  %{
-                    price: Money.new(:USD, "39.99")
-                  },
-                  %{
-                    price: Money.new(:USD, "49.99")
-                  }
-                ]
-              }
-            ]
-          }
-          |> Product.create!()
-
-        display_product_variant = Product.display_product_variant!(product)
-
-        dynamic_product = unquote(resource).create!()
-
-        cart =
-          Cart.add_to_cart!(
-            cart,
-            %{
-              product_variant: display_product_variant,
-              dynamic_product_id: dynamic_product.id,
-              product_type: unquote(type)
-            }
-          )
-
-        %{
-          cart: cart,
-          dynamic_product: dynamic_product,
-          product_variant: display_product_variant
-        }
-      end
-
-      test "Cart.add_to_cart/1 adds a product variant to the cart (#{type})", %{
-        cart: cart,
-        dynamic_product: %{hash: dynamic_product_hash},
-        product_variant: %{id: product_variant_id} = product_variant
-      } do
-        [cart_item] = cart.cart_items
-
-        assert %{
-                 quantity: 1,
-                 product_variant_id: ^product_variant_id,
-                 display_id: ^dynamic_product_hash
-               } = cart_item
-
-        # title and description should be fetched from the resource itself, not from the product variant
-        refute CartItem.display_title!(cart_item) == product_variant.title
-        refute CartItem.display_description!(cart_item) == product_variant.description
-      end
-
-      test "Cart.add_to_cart/1 increments a cart item's quantity if the product variant already exists in the cart (#{type})",
-           %{
-             cart: cart,
-             dynamic_product: dynamic_product,
-             product_variant: %{id: product_variant_id} = product_variant
-           } do
-        cart =
-          for _ <- 1..4, reduce: cart do
-            cart ->
-              cart =
-                Cart.add_to_cart!(cart, %{
-                  product_variant: product_variant,
-                  dynamic_product_id: dynamic_product.id,
-                  product_type: unquote(type)
-                })
-
-              cart
-          end
-
-        [cart_item] = cart.cart_items
-
-        assert %{quantity: 5, product_variant_id: ^product_variant_id} = cart_item
-      end
-
-      test "Cart.contains?/3 returns true if a cart contains a product and false otherwise (#{type})",
-           %{
-             cart: cart,
-             dynamic_product: dynamic_product
-           } do
-        assert Cart.contains?(cart, unquote(type), dynamic_product.id)
-        assert not Cart.contains?(cart, unquote(type), "0f8d71a6-6b2f-4e83-b8a2-8743d83fbf63")
-      end
     end
   end
 

@@ -16,12 +16,12 @@ defmodule Shopifex.Checkouts.CheckoutSession do
   end
 
   state_machine do
-    initial_states([:open])
-    default_initial_state(:open)
+    initial_states [:open]
+    default_initial_state :open
 
     transitions do
-      transition(:complete_checkout, from: :open, to: :complete)
-      transition(:expire, from: [:open, :expired], to: :expired)
+      transition :complete_checkout, from: :open, to: :complete
+      transition :expire, from: [:open, :expired], to: :expired
     end
   end
 
