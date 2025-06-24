@@ -40,7 +40,7 @@ defmodule Shopifex.Carts.CartItem do
   actions do
     # the update action is required by Cart:
     # actions -> update -> add_to_cart -> change -> manage_relationship -> cart_item -> cart_items
-    defaults [:read, update: []]
+    defaults [:read]
 
     create :create_or_increment_quantity do
       accept [:product_type, :dynamic_product_id]
@@ -58,6 +58,14 @@ defmodule Shopifex.Carts.CartItem do
 
       change manage_relationship(:product_variant, type: :append)
       change manage_relationship(:price_variant, type: :append)
+    end
+
+    update :update do
+      accept []
+
+      primary? true
+
+      require_atomic? false
     end
 
     update :update_quantity do
