@@ -27,9 +27,9 @@ defmodule Shopifex.MixProject do
     [
       {:ash, "~> 3.0"},
       {:ash_postgres, "~> 2.0"},
-      {:ash_money, "~> 0.1"},
+      {:ash_money, "~> 0.2"},
       {:ash_admin, "~> 0.11"},
-      {:ash_archival, "~> 1.0"},
+      {:ash_archival, "~> 2.0"},
       {:ash_state_machine, "~> 0.2.5"},
       {:igniter, "~> 0.0"},
       {:ex_money_sql, "~> 1.0", optional: true},
